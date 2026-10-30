@@ -17,14 +17,14 @@ jobs:
       - name: Build with Docker
         run: |
           mkdir build
-          docker build -f Dockerfile -o type=oci,dest=build/charter-build --tag charter-build:latest .
+          docker build -f Dockerfile -o type=oci,dest=build/charter-httpserver --tag charter/http-server:latest .
       
       - name: Upload image to AWS server
         uses: nogsantos/scp-deploy@master
         with:
-          src: "build/charter-build"
-          host: "ec2-13-50-242-217.eu-north-1.compute.amazonaws.com"
-          remote: "/home/ubuntu/charter-build"
+          src: "build/charter-httpserver"
+          host: "ec2-16-192-213-81.eu-north-1.compute.amazonaws.com"
+          remote: "/home/ubuntu/charter-httpserver"
           port: "22"
           user: "ubuntu"
           key: ${{ secrets.SERVER_LOGIN }}
@@ -32,11 +32,11 @@ jobs:
       - name: Load image and restart HTTP server
         uses: appleboy/ssh-action@v1
         with:
-          host: "ec2-13-50-242-217.eu-north-1.compute.amazonaws.com"
+          host: "ec2-16-192-213-81.eu-north-1.compute.amazonaws.com"
           username: "ubuntu"
           key: ${{ secrets.SERVER_LOGIN }}
           port: "22"
           script: |
             sudo docker stop charter-http-server
-            sudo docker load -i charter-build
-            sudo docker run -d --name charter-http-server --rm -p 5201:8080 charter-build:latest
+            sudo docker load -i charter-httpserver
+            sudo docker run -d --name charter-http-server --rm -p 5201:8080 -p 8080:5173 charter/http-server:latest sh /root/entrypoint.sh
