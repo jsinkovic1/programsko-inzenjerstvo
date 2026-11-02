@@ -20,7 +20,7 @@ function App() {
 
     return (
         <>
-            <body>
+            <body className="h-dvh bg-red-500">
             time: {time}
             </body>
         </>
