@@ -2,7 +2,7 @@ name: CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feature/backend-controllers-dtos ]
 
 jobs:
   deploy:
@@ -39,4 +39,4 @@ jobs:
           script: |
             sudo docker stop charter-http-server
             sudo docker load -i charter-httpserver
-            sudo docker run -d --name charter-http-server --rm -p 5201:8080 -p 8080:5173 charter/http-server:latest sh /root/entrypoint.sh
+            sudo docker run -d -e HOST_ADDRESS=${{ env.HOST_ADDRESS }} -e HOST_PORT=${{ env.HOST_PORT }} -e DATABASE_NAME=${{ secrets.DATABASE_NAME }} -e DATABASE_USER=${{ secrets.DATABASE_USER }} -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} --name charter-http-server --rm -p 5201:8080 -p 8080:5173 charter/http-server:latest sh /root/entrypoint.sh
