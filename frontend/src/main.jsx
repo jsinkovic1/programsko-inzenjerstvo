@@ -5,11 +5,11 @@ import App from './App.jsx'
 import Header from './Header.jsx'
 
 createRoot(document.getElementById('root')).render(
+    <Header />
+)
+createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
   </StrictMode>,
 )
 
-createRoot(document.getElementById('root')).render(
-    <Header />
-)

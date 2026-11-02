@@ -1,30 +1,22 @@
-import {useState, useEffect} from 'react'
 import './App.css'
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+import Home from "./Home.jsx";
+import Details from "./Details.jsx";
+import Map from "./Map.jsx"
+
 
 function App() {
-    const [data, setData] = useState(null);
-
-    useEffect(() => {
-        fetch("/api/test", { mode: "cors" }).then(result => result.json()).then(result => {
-            setData(result);
-        });
-    }, []);
-
-
-    console.log(data)
-
-    var time = ""
-    if (data != null) {
-        time = data.time
-    }
-
     return (
-        <>
-            <body className="h-dvh bg-red-500">
-            time: {time}
-            </body>
-        </>
-    )
+        <BrowserRouter>
+
+            {/* Routes */}
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/map" element={<Map />} />
+                <Route path="/details" element={<Details />} />
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
-export default App
+export default App;
