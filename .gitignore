@@ -91,3 +91,5 @@ out
 *.idea
 *bin
 *obj
+/backend/Properties/
+backend/Properties/
