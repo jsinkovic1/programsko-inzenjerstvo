@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CharterBackend.Data;
+using CharterBackend.Dtos;
+using CharterBackend.Mappers;
+using CharterBackend.Utilities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.EntityFrameworkCore;
 using System;
-using CharterBackend.Data;
+using System.Data.Common;
 
 namespace CharterBackend.Controllers
 {
@@ -11,40 +15,68 @@ namespace CharterBackend.Controllers
 	public class PloviloController : ControllerBase
 	{
 		private readonly AppDbContext ctx;
+		private readonly SearchUtility searchUtility = new SearchUtility();
 
 		public PloviloController(AppDbContext ctx)
 		{
 			this.ctx = ctx;
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> Get()
-		{
-			var plovila = await ctx.Plovila
-				.Include(p => p.Proizvodac)
-				.Select(p => new
-				{
-					name = p.Nazivplovila,
-                    year = p.Godinaproizvodnje,
-					manufacturer = p.Proizvodac.Nazivproizvodaca,
-                })
-				.ToListAsync();
 
-			return Ok(plovila);
+		[HttpGet()]
+		public async Task<IActionResult> GetAll()
+		{
+			List<PloviloDTO> vessels;
+
+			try
+			{
+				vessels = await ctx.Plovila.Select(v => v.ToPloviloDTO()).ToListAsync();
+			}
+            catch (DbException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Došlo je do greške prilikom dohvaćanja podataka");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Došlo je do neočekivane greške na serveru");
+            }
+            return Ok(vessels);
 		}
 
-		[HttpGet("id")]
+		[HttpGet("{id:int}")]
 		public async Task<IActionResult> Get(int id)
 		{
-			var plovilo = await ctx.Plovila
-				.Include(p => p.Proizvodac)
-				.Include(p => p.Tipplovila)
-				.Include(p => p.Luka)
-				.Where(p => p.Idplovila == id)
-				.FirstOrDefaultAsync();
+			PloviloDTO? vessel;
+			try
+			{
+				vessel = await ctx.Plovila.Where(p => p.Idplovila == id).
+												Select(p => p.ToPloviloDTO()).
+												FirstOrDefaultAsync();
+			}
+            catch (DbException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Došlo je do greške prilikom dohvaćanja podataka");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Došlo je do neočekivane greške na serveru");
+            }
 
-			return Ok(plovilo);
+			if (vessel == null) return NotFound("Plovilo nije pronađeno");
+
+            return Ok(vessel);
         }
+
+		[HttpGet("search")]
+		public async Task<IActionResult> SearchForVesselName([FromQuery] string name)
+		{
+			var vessels =await ctx.Plovila.
+								   Select(p => p.ToPloviloDTO()).
+								   ToListAsync();
+
+			var result = vessels.Where(v => searchUtility.LevenshteinDistance(v.Nazivplovila, name) <= 2);
+			return Ok(result);
+		}
 	}
 }
 
