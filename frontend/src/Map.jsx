@@ -2,13 +2,43 @@
 import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 import 'leaflet/dist/leaflet.css'
 import {useEffect, useMemo, useState} from "react";
+import "./Map.css"
+import {Icon} from "leaflet/src/layer/index.js";
+import markerSvg from "./assets/marker.svg"
+import placeholder from "./assets/placeholder.svg"
 
 
-function HarborPin({ position, name }) {
-    const [vesselNames, SetVesselNames] = useState("")
+function VesselCard(vessel)
+{
+    return(
+        <li>
+            <div className={"h-40 bg-gray-100 m-1 rounded-lg flex flex-row overflow-hidden"}>
+                <img src={placeholder} alt="placeholder" className={"h-full aspect-square"}>
+                </img>
+
+                <div className={"grow flew col text-left m-1"}>
+                    <p>{vessel["nazivplovila"]}</p>
+                    <hr/>
+                    <p>Kapacitet: {vessel["kapacitet"]}</p>
+                    <p>Kabina: {vessel["brojkabina"]}</p>
+                    <p>Ležajeva: {vessel["brojlezajeva"]}</p>
+                </div>
+            </div>
+
+        </li>)
+}
+function HarborMarker({ position, name }) {
+    const [vesselCards, SetVesselCards] = useState("")
+    const icon = new Icon({
+        iconUrl: markerSvg,
+        iconSize:     [50, 50], // size of the icon
+        shadowSize:   [0, 0], // size of the shadow
+        iconAnchor:   [25, 25], // point of the icon which will correspond to marker's location
+        shadowAnchor: [50, 50],  // the same for the shadow
+        popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+    });
     const eventHandlers = useMemo(() => ({
         async popupopen() {
-            console.log(name)
             const response = await fetch("/api/filter", {
                 method: "POST",
                 body: JSON.stringify({ harborName: name }),
@@ -17,19 +47,20 @@ function HarborPin({ position, name }) {
                 }
             })
             const json = await response.json()
-            console.log(json)
-            SetVesselNames(json.map(x => (<li>{x["nazivplovila"]}</li>)))
+            SetVesselCards(json.map(x => VesselCard(x)))
         },
-    }), [])
+    }), [name])
 
     return (
-        <Marker eventHandlers={eventHandlers} position={position}>
-            <Popup>
-                <h2>{name}</h2>
-                <hr />
-                <ul>
-                    {vesselNames}
+        <Marker eventHandlers={eventHandlers} position={position}  icon={icon}>
+            <Popup closeButton={false}>
+                <div className={"absolute -top-8 w-auto h-16 -z-1 bg-white rounded-xl text-2xl pl-1 pr-1"}>
+                    {name}
+                </div>
+                <ul className={"w-full h-full flex-col overflow-y-scroll rounded-xl"}>
+                    {vesselCards}
                 </ul>
+
             </Popup>
         </Marker>)
 }
@@ -44,7 +75,7 @@ function Map() {
     }, [])
 
     try {
-        var markers = pins.map(pin => <HarborPin position={[parseFloat(pin["latituda"]), parseFloat(pin["longituda"])]} name={pin["nazivluke"]}/>)
+        var markers = pins.map(pin => <HarborMarker position={[parseFloat(pin["latituda"]), parseFloat(pin["longituda"])]} name={pin["nazivluke"]}/>)
     } catch {
         markers = ""
     }
