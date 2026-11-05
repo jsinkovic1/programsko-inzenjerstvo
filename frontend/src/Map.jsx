@@ -16,12 +16,13 @@ function VesselCard(vessel)
                 <img src={placeholder} alt="placeholder" className={"h-full aspect-square"}>
                 </img>
 
-                <div className={"grow flew col text-left m-1"}>
-                    <p>{vessel["nazivplovila"]}</p>
-                    <hr/>
-                    <p>Kapacitet: {vessel["kapacitet"]}</p>
-                    <p>Kabina: {vessel["brojkabina"]}</p>
-                    <p>Ležajeva: {vessel["brojlezajeva"]}</p>
+                <div className={"grow flex flex-col text-left m-1"}>
+                    <div className={"font-title basis-10"}>{vessel["nazivplovila"]}</div>
+                    <div className={"font-sans basis-15"}>
+                        Kapacitet: {vessel["kapacitet"]}<br/>
+                        Kabina: {vessel["brojkabina"]}<br/>
+                        Ležajeva: {vessel["brojlezajeva"]}
+                    </div>
                 </div>
             </div>
 
