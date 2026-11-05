@@ -3,6 +3,40 @@ import {useEffect, useState} from "react";
 import { useParams } from 'react-router-dom';
 import placeholder from "./assets/placeholder.svg";
 import Header from "./Header.jsx";
+import ImageGallery from 'react-image-gallery';
+import 'react-image-gallery/styles/image-gallery.css';
+
+
+const images = [
+  {
+    original: placeholder,
+    thumbnail: placeholder,
+  },
+  {
+    original: placeholder,
+    thumbnail: placeholder,
+  },
+  {
+    original: placeholder,
+    thumbnail: placeholder,
+  },
+  {
+    original: placeholder,
+    thumbnail: placeholder,
+  },
+  {
+    original: placeholder,
+    thumbnail: placeholder,
+  },
+];
+
+const MyGallery = () => {
+  return <ImageGallery
+   items={images} 
+   showPlayButton={false}
+   showFullscreenButton={false}/>;
+};
+
 
 function Vessel() {
     const { id:boatId } = useParams();
@@ -27,7 +61,7 @@ function Vessel() {
                 <h2 className="text-2xl font-title font-bold">
                     {boat.nazivplovila}
                 </h2>
-                <img src={placeholder} alt="boat" className="w-4/5 rounded-md object-contain" />
+                {MyGallery()}
             </div>
 
             {/*stupac #2*/}
