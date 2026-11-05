@@ -1,18 +1,36 @@
 ## @file generate-puml-diagrams.yaml
-## @brief Automated PlantUML diagram rendering and repository synchronization workflow.
-## @author Vlado Sruk
-## @date Created: March 2023 | Revision: 3.1 (2026)
-## @version 3.1
+## @brief Automated PlantUML diagram rendering inside pull requests.
+## @author Vlado Sruk (original workflow, v1.0 - v3.1)
+## @author Josip Sinković (adaptation for PR-based workflow, v4.0)
+## @date Created: March 2023 | Revision: 3.1 (2026) | Revision: 4.0 (November 2026)
+## @version 4.0
 ## @license SPDX-License-Identifier: MIT
-## @copyright Copyright (c) 2023-2026 Vlado Sruk. Licensed under the MIT License.
+## @copyright Copyright (c) 2023-2026 Vlado Sruk.
+##            Modifications (v4.0) Copyright (c) 2026 Josip Sinković.
+##            Licensed under the MIT License.
 ##
-## @note Workflow architecture and logic designed by the author.
+## @note Original workflow architecture and logic (v1.0 - v3.1) designed by Vlado Sruk.
 ##       Doxygen-compatible code comments and annotations generated with AI assistance (Gemini).
-## @details This GitHub Actions workflow automates compiling PlantUML source files (.puml)
-##          into SVG vector assets whenever PUML files are modified or when manually dispatched.
-##          Build dependencies (Graphviz, PlantUML JAR) are restored from cache (since v2).
-##          Diagrams are validated with strict error checking, the source folder structure is
-##          mirrored in the output, and updated SVGs are committed back to the main branch.
+## @note v4.0 (Josip Sinković): adapted to repositories whose main branch is protected
+##       and accepts changes only through pull requests. SVGs are no longer pushed to
+##       main. They are rendered and committed to the pull request branch, so they are
+##       reviewed and merged together with the .puml sources.
+##       v4.0 changes prepared with AI assistance (Claude).
+## @details This GitHub Actions workflow compiles PlantUML source files (.puml) into SVG
+##          vector assets whenever a pull request changes them. Build dependencies
+##          (Graphviz, PlantUML JAR) are restored from cache. Diagrams are validated with
+##          strict error checking, the source folder structure is mirrored in the output,
+##          and updated SVGs are committed back to the pull request branch.
+##
+## @par Token setup (recommended)
+##      Commits pushed with the default GITHUB_TOKEN do not trigger other workflows, so
+##      required status checks would never run on the bot commit and the PR stays blocked.
+##      To avoid that, create a GitHub App with "Contents: Read and write" permission,
+##      install it on this repository and add:
+##        - repository variable  DIAGRAM_BOT_CLIENT_ID    (the App Client ID)
+##        - repository secret    DIAGRAM_BOT_PRIVATE_KEY  (the App private key, .pem)
+##      Without them the workflow falls back to GITHUB_TOKEN, which is fine when the
+##      repository has no required status checks.
 
 name: Generate PlantUML diagrams
 
@@ -20,42 +38,46 @@ name: Generate PlantUML diagrams
 # Triggers
 # ==============================================================================
 ## @section triggers Triggers
-## Workflow runs on direct pushes targeting diagram sources or via manual dispatch.
+## Workflow runs on pull requests that touch diagram sources or this workflow file.
+## Note: for pull_request events the paths filter is evaluated against the whole PR
+## diff, not only the latest commit. After the bot commit, one more run happens, finds
+## no changes and stops, so there is no infinite loop.
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
     paths:
       - "docs/puml/**/*.puml"
       - ".github/workflows/generate-puml-diagrams.yaml"
-  workflow_dispatch:
 
 # ==============================================================================
 # Permissions & Concurrency
 # ==============================================================================
 ## @section permissions Permissions
-## Write permission is required to push generated SVG assets back to the repo.
+## Write permission is required to push generated SVG assets to the PR branch
+## (used only when falling back to GITHUB_TOKEN).
 permissions:
   contents: write
 
 ## @section concurrency Concurrency
-## Ensures sequential execution per branch ref to avoid git push collisions.
+## One run per pull request. A newer push cancels the older run, since only the
+## latest state of the branch matters
 concurrency:
-  group: plantuml-${{ github.ref }}
-  cancel-in-progress: false
+  group: plantuml-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 # ==============================================================================
 # Jobs
 # ==============================================================================
 jobs:
-  ## @brief Compiles PUML sources to SVG format and commits diffs.
+  ## @brief Compiles PUML sources to SVG format and commits diffs to the PR branch.
   generate-svg:
     name: Build and Commit Diagrams
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    # Publish only from main, even when started manually via workflow_dispatch.
-    if: github.ref == 'refs/heads/main'
+    # Only pull requests from branches of this repository. PRs from forks get a
+    # read-only token and no secrets, so they cannot receive bot commits.
+    if: github.event.pull_request.head.repo.full_name == github.repository
 
     env:
       PLANTUML_VERSION: "1.2025.4"
@@ -64,18 +86,31 @@ jobs:
       PLANTUML_SHA256: ""
 
     steps:
-      # Step 1: Check out the repository source tree
-      - name: Checkout repository
-        uses: actions/checkout@v5
+      # Step 1: Obtain a GitHub App token (skipped when the App is not configured)
+      - name: Get bot token
+        id: app-token
+        if: vars.DIAGRAM_BOT_CLIENT_ID != ''
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.DIAGRAM_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.DIAGRAM_BOT_PRIVATE_KEY }}
 
-      # Step 2: Pin the Java runtime so builds do not change with runner image updates
+      # Step 2: Check out the PR branch itself (not the default refs/pull/N/merge
+      # commit, which is a detached HEAD and cannot be pushed to)
+      - name: Checkout PR branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ steps.app-token.outputs.token || github.token }}
+
+      # Step 3: Pin the Java runtime so builds do not change with runner image updates
       - name: Set up Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
 
-      # Step 3: Cache Graphviz (dot) apt package for fast runner setup
+      # Step 4: Cache Graphviz (dot) apt package for fast runner setup
       # TODO: pin this third-party action to a full commit SHA (keep the version in a comment).
       - name: Cache Graphviz (apt)
         uses: awalsh128/cache-apt-pkgs-action@v1
@@ -83,11 +118,11 @@ jobs:
           packages: graphviz
           version: 1.0
 
-      # Step 4: Register Graphviz plugin configuration
+      # Step 5: Register Graphviz plugin configuration
       - name: Register Graphviz plugins
         run: sudo dot -c
 
-      # Step 5: Restore cached PlantUML binary based on pinned version
+      # Step 6: Restore cached PlantUML binary based on pinned version
       - name: Cache PlantUML jar
         id: jar-cache
         uses: actions/cache@v5
@@ -95,7 +130,7 @@ jobs:
           path: plantuml.jar
           key: plantuml-${{ runner.os }}-${{ env.PLANTUML_VERSION }}
 
-      # Step 6: Download PlantUML JAR if not retrieved from cache
+      # Step 7: Download PlantUML JAR if not retrieved from cache
       - name: Download PlantUML
         if: steps.jar-cache.outputs.cache-hit != 'true'
         run: |
@@ -107,8 +142,9 @@ jobs:
             echo "${PLANTUML_SHA256}  plantuml.jar" | sha256sum -c -
           fi
 
-      # Step 7: Render every .puml file to SVG, mirroring the docs/puml folder structure
+      # Step 8: Render every .puml file to SVG, mirroring the docs/puml folder structure
       # so files with the same name in different subfolders do not overwrite each other.
+      # The output folder is recreated, so SVGs of deleted .puml files are removed too.
       - name: Generate SVG diagrams
         shell: bash
         run: |
@@ -124,9 +160,14 @@ jobs:
             java -jar plantuml.jar -tsvg -failonerror -o "$dest" "$file"
           done
 
-      # Step 8: Commit and push changes if updated SVGs are detected
-      - name: Commit generated diagrams
+      # Step 9: Commit and push changes to the PR branch if updated SVGs are detected.
+      # The branch name is passed through env (not inlined) to prevent script injection.
+      # There is no pull --rebase: if the author pushed in the meantime, this push is
+      # rejected and the newer run (triggered by the author's push) does the work.
+      - name: Commit generated diagrams to PR branch
         shell: bash
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -139,6 +180,5 @@ jobs:
             echo "No diagram changes detected. Skipping commit."
           else
             git commit -m "docs: regenerate PlantUML diagrams"
-            git pull --rebase
-            git push
+            git push origin "HEAD:${HEAD_REF}"
           fi
