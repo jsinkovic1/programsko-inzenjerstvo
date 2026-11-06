@@ -6,7 +6,7 @@
 
 **Cilj:** Prikazati granicu sustava, relevantne aktere i njihove glavne ciljeve u preglednom UML dijagramu obrazaca uporabe.
 
-![Dijagram obrazaca uporabe sustava za charter poslovanje](./diagrams/charter-uml-diagram.png)
+![Dijagram obrazaca uporabe sustava za charter poslovanje](./assets/diagrams/charter-uml-diagram.svg)
 
 **Slika 3.1. Dijagram obrazaca uporabe sustava za charter poslovanje**
 
