@@ -1,0 +1,124 @@
+@startuml
+title Sustav za charter poslovanje – oblikovanje rezervacija
+
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+skinparam ArrowColor #212529
+
+skinparam class {
+    BackgroundColor #E7F1FF
+    BorderColor #0D6EFD
+}
+
+skinparam note {
+    BackgroundColor #F8F9FA
+    BorderColor #212529
+    FontColor #212529
+}
+
+hide empty members
+
+' ==============================================================================
+' API sloj
+' ==============================================================================
+package "API sloj" {
+  class RezervacijaController <<Controller>> {
+    +Izradi()
+    +Potvrdi()
+    +Otkazi()
+  }
+}
+
+' ==============================================================================
+' Aplikacijski sloj
+' ==============================================================================
+package "Aplikacijski sloj" {
+  class RezervacijaService <<Service>> {
+    +IzracunajIznos()
+    +IzradiZahtjev()
+    +Potvrdi()
+    +Otkazi()
+  }
+
+  interface IObavijestiService {
+    +PosaljiObavijest(r: Rezervacija)
+  }
+}
+
+' ==============================================================================
+' Domenski sloj
+' ==============================================================================
+package "Domenski sloj" {
+  class Rezervacija {
+    -iznos: decimal
+    -brojOsoba: int
+    -status: StatusRezervacije
+    +Potvrdi()
+    +Otkazi()
+    +Zavrsi()
+  }
+
+  class Termin {
+    -vrijemeOd: DateTime
+    -vrijemeDo: DateTime
+  }
+
+  class RazdobljeNajma {
+    +BrojDana(): int
+  }
+
+  class KalkulatorIznosa {
+    +Izracunaj(): decimal
+  }
+
+  enum StatusRezervacije {
+    ZAHTJEV
+    POTVRDENA
+    OTKAZANA
+    ZAVRSENA
+  }
+}
+
+' ==============================================================================
+' Infrastruktura
+' ==============================================================================
+package "Infrastruktura" {
+  class EmailObavijestiService
+}
+
+' ==============================================================================
+' Veze
+' ==============================================================================
+RezervacijaController ..> RezervacijaService : koristi ►
+RezervacijaService ..> Rezervacija : stvara / mijenja ►
+RezervacijaService ..> KalkulatorIznosa : računa iznos ►
+RezervacijaService ..> IObavijestiService : šalje obavijest ►
+EmailObavijestiService ..|> IObavijestiService
+
+Rezervacija "1" -- "1" Termin : zauzima ►
+Rezervacija --> StatusRezervacije
+Termin ..> RazdobljeNajma
+KalkulatorIznosa ..> RazdobljeNajma
+
+' ==============================================================================
+' Pravila
+' ==============================================================================
+note right of Rezervacija
+  Nova rezervacija ima status ZAHTJEV.
+  Rezervacija sama odbija nedopuštene
+  prijelaze statusa (npr. potvrdu
+  otkazane rezervacije).
+end note
+
+note bottom of KalkulatorIznosa
+  iznos = dnevna cijena × dani
+        + oprema × količina × dani
+        + usluge × količina
+end note
+
+note bottom of RazdobljeNajma
+  Dani = ceil(sati / 24),
+  najmanje 1.
+end note
+@enduml
