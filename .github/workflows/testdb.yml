@@ -5,9 +5,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6.0.0
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v5
+        
+      - name: Pre-build setup
+        run: |
+          echo "${{ secrets.TESTDB_CREATE_USERS_SQL }}" >> "db/zzz-charter-database-users.sql"
 
       - name: Build with Docker
         run: |
@@ -23,3 +29,16 @@ jobs:
           port: "22"
           user: "ubuntu"
           key: ${{ secrets.SERVER_LOGIN }}
+          
+      - name: Load image and restart test database server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: "ec2-16-192-213-81.eu-north-1.compute.amazonaws.com"
+          username: "ubuntu"
+          key: ${{ secrets.SERVER_LOGIN }}
+          port: "22"
+          script: |
+            sudo docker stop charter-testdb
+            sudo docker load -i database/charter-testdb
+            sudo docker system prune -f
+            sudo docker run -d -e POSTGRES_PASSWORD=${{ secrets.TESTDB_DEFAULT_PASSWORD }} --name charter-testdb -p 5433:5432 --rm charter/database:testing postgres
