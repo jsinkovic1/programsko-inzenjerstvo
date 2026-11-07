@@ -215,22 +215,32 @@ ALTER TABLE TERMIN
 	) WHERE (status <> 'OTKAZANA');
 
 --FUNCTIONS AND TRIGGERS
---ova funkcija i trigger sprječavaju da se više korisnika veže na istu rezervaciju
+--ova funkcija i trigger sprječavaju da se više klijenata veže na istu rezervaciju
 CREATE FUNCTION trg_check_UserReservation() RETURNS trigger AS
 $$
 BEGIN
-    IF EXISTS (
-        SELECT 1
-        FROM korisnik_rezervacija kr
-        NATURAL JOIN korisnik k
-        WHERE k.uloga = 'KORISNIK'
-          AND kr.idTermina = NEW.idTermina
-          AND kr.idKorisnika <> NEW.idKorisnika
-    ) THEN
-        RAISE EXCEPTION 'Error: nije dozvoljeno vezati više korisnika na istu rezervaciju.';
-    END IF;
-
+  --dopušta dodjelu više djelatnika i ostalih uloga rezervaciji
+  IF NOT EXISTS (
+    SELECT 1
+    FROM korisnik
+    WHERE idKorisnika = NEW.idKorisnika
+      AND uloga = 'KORISNIK'
+  ) THEN
     RETURN NEW;
+  END IF;
+
+  IF EXISTS (
+      SELECT 1
+      FROM korisnik_rezervacija kr
+      NATURAL JOIN korisnik k
+      WHERE k.uloga = 'KORISNIK'
+        AND kr.idTermina = NEW.idTermina
+        AND kr.idKorisnika <> NEW.idKorisnika
+  ) THEN
+      RAISE EXCEPTION 'Error: nije dozvoljeno vezati više korisnika na istu rezervaciju.';
+  END IF;
+
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -244,10 +254,10 @@ CREATE TRIGGER chk_korisnik_rezervacija
 CREATE FUNCTION trg_check_ReservationStatus() RETURNS trigger AS
 $$
 	DECLARE 
-		status termin.status%TYPE;
+		v_status termin.status%TYPE;
 	BEGIN
-		status := (SELECT status FROM termin WHERE termin.idtermina = NEW.idtermina);
-		IF(status = 'NEDOSTUPAN TERMIN') THEN
+		v_status := (SELECT status FROM termin WHERE termin.idtermina = NEW.idtermina);
+		IF(v_status = 'NEDOSTUPAN TERMIN') THEN
 			RAISE EXCEPTION 'Error: rezervacija ne smije imati status "NEDOSTUPAN TERMIN"';
 			RETURN NULL;
 		ELSE
@@ -262,14 +272,14 @@ CREATE TRIGGER chk_status_rezervacije
 	EXECUTE FUNCTION trg_check_ReservationStatus();
 
 	
---ova funkcija i trigger sprječavaju da u tablici nedostupanTermin postoji termin koji nema status nedostupnog termina
+--ova funkcija i trigger sprječavaju da u tablici nedostupniTermin postoji termin koji nema status nedostupnog termina
 CREATE FUNCTION trg_check_UnavailableTerminStatus() RETURNS trigger AS
 $$
 	DECLARE 
-		status termin.status%TYPE;
+		v_status termin.status%TYPE;
 	BEGIN
-		status := (SELECT status FROM termin WHERE termin.idtermina = NEW.idtermina);
-		IF(status <> 'NEDOSTUPAN TERMIN') THEN
+		v_status := (SELECT status FROM termin WHERE termin.idtermina = NEW.idtermina);
+		IF(v_status <> 'NEDOSTUPAN TERMIN') THEN
 			RAISE EXCEPTION 'Error: nedostupan termin smije imati samo status "NEDOSTUPAN TERMIN"';
 			RETURN NULL;
 		ELSE
@@ -294,7 +304,7 @@ $$
 				RAISE EXCEPTION 'Error: nije dozvoljeno promijeniti status postojeće rezervacije u "NEDOSTUPAN TERMIN"';
 				RETURN NULL;
 		ELSIF(NEW.status <> 'NEDOSTUPAN TERMIN' AND
-			EXISTS(SELECT 1 FROM nedostupantermin WHERE idTermina = NEW.idTermina))
+			EXISTS(SELECT 1 FROM nedostupnitermin WHERE idTermina = NEW.idTermina))
 			THEN
 				RAISE EXCEPTION 'Error: nije dozvoljeno promijeniti status postojećeg nedostupnog termina';
 				RETURN NULL;
