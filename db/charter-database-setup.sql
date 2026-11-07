@@ -218,21 +218,20 @@ ALTER TABLE TERMIN
 --ova funkcija i trigger sprječavaju da se više korisnika veže na istu rezervaciju
 CREATE FUNCTION trg_check_UserReservation() RETURNS trigger AS
 $$
-	DECLARE
-		counter INT;
-	BEGIN
-		counter := (SELECT COUNT(*) FROM korisnik_rezervacija NATURAL JOIN KORISNIK
-						WHERE uloga = 'KORISNIK' AND idTermina = NEW.idTermina);
-		IF(TG_OP='UPDATE' AND counter>1) THEN
-			RAISE EXCEPTION 'Error: nije dozvoljeno vezati više korisnika na istu rezervaciju.';
-			RETURN NULL;
-		ELSIF (TG_OP = 'INSERT' AND counter > 0) THEN
-			RAISE EXCEPTION 'Error: nije dozvoljeno vezati više korisnika na istu rezervaciju.';
-			RETURN NULL;
-		ELSE
-			RETURN NEW;
-		END IF;
-	END;
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM korisnik_rezervacija kr
+        NATURAL JOIN korisnik k
+        WHERE k.uloga = 'KORISNIK'
+          AND kr.idTermina = NEW.idTermina
+          AND kr.idKorisnika <> NEW.idKorisnika
+    ) THEN
+        RAISE EXCEPTION 'Error: nije dozvoljeno vezati više korisnika na istu rezervaciju.';
+    END IF;
+
+    RETURN NEW;
+END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER chk_korisnik_rezervacija
