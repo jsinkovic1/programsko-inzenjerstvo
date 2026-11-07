@@ -39,6 +39,5 @@ jobs:
           script: |
             sudo docker stop charter-http-server
             sudo docker load -i charter-httpserver
-            echo "$HOST_ADDRESS"
-            echo $HOST_PORT
+            sudo docker system prune -a -f
             sudo docker run -d -e HOST_ADDRESS="${{ vars.HOST_ADDRESS }}" -e HOST_PORT=${{ vars.HOST_PORT }} -e DATABASE_NAME=${{ secrets.DATABASE_NAME }} -e DATABASE_USER=${{ secrets.DATABASE_USER }} -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} --name charter-http-server --rm -p 5201:8080 -p 8080:5173 charter/http-server:latest sh /root/entrypoint.sh
