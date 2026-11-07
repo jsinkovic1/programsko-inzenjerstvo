@@ -1,11 +1,11 @@
-﻿import Header from "./Header.jsx";
+﻿import Header from "../components/Header.jsx";
 import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 import 'leaflet/dist/leaflet.css'
 import {useEffect, useMemo, useState} from "react";
 import "./Map.css"
 import {Icon} from "leaflet/src/layer/index.js";
-import markerSvg from "./assets/marker.svg"
-import placeholder from "./assets/placeholder.svg"
+import markerSvg from "../assets/marker.svg"
+import placeholder from "../assets/placeholder.svg"
 
 
 function VesselCard(vessel)

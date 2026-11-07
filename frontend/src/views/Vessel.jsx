@@ -1,8 +1,8 @@
-import './Vessel.css'
+import '../App.css'
 import {useEffect, useState} from "react";
 import { useParams } from 'react-router-dom';
-import placeholder from "./assets/placeholder.svg";
-import Header from "./Header.jsx";
+import placeholder from "../assets/placeholder.svg";
+import Header from "../components/Header.jsx";
 import ImageGallery from 'react-image-gallery';
 import 'react-image-gallery/styles/image-gallery.css';
 

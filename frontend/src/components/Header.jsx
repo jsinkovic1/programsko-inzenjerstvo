@@ -1,5 +1,5 @@
 ﻿import {Component} from "react";
-import userIcon from "./assets/user.svg";
+import userIcon from "../assets/user.svg";
 
 function Logo() {
   return (
@@ -18,8 +18,8 @@ function Logo() {
 class Header extends Component {
     render() {
         return ( 
-      <header className="relative flex h-[67px] items-center justify-between bg-linear-to-r from-navy to-brand px-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.25)]">
-        <a href="/" className="flex" aria-label="Charter home">
+      <header className="relative flex h-[67px] items-center justify-between bg-linear-to-r from-blue-950 to-blue-500 px-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.25)]">
+        <a href="/public" className="flex" aria-label="Charter home">
           <Logo />
         </a>
 

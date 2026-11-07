@@ -1,7 +1,7 @@
-﻿import './Details.css'
-import Header from "./Header.jsx";
+﻿import '../App.css'
+import Header from "../components/Header.jsx";
 import {useEffect, useState} from "react";
-import placeholder from "./assets/placeholder.svg";
+import placeholder from "../assets/placeholder.svg";
 import { useNavigate } from 'react-router-dom';
 
 function Details()
