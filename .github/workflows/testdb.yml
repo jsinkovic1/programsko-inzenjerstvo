@@ -1,0 +1,25 @@
+﻿name: Deploy Test Database
+on: workflow_dispatch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v5
+
+      - name: Build with Docker
+        run: |
+          mkdir build
+          docker build -o type=oci,dest=build/charter-testdb -f db/Dockerfile --tag charter/database:testing ./db
+
+      - name: Upload image to AWS server
+        uses: nogsantos/scp-deploy@master
+        with:
+          src: "build/charter-testdb"
+          host: "ec2-16-192-213-81.eu-north-1.compute.amazonaws.com"
+          remote: "/home/ubuntu/database/charter-testdb"
+          port: "22"
+          user: "ubuntu"
+          key: ${{ secrets.SERVER_LOGIN }}
