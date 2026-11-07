@@ -5,6 +5,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6.0.0
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v5
