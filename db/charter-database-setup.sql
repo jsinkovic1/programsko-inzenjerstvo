@@ -6,7 +6,6 @@ CREATE TABLE KORISNIK
   ime VARCHAR(50) NOT NULL,
   prezime VARCHAR(50) NOT NULL,
   mail VARCHAR(100) NOT NULL,
-  datumRodenja DATE NOT NULL,
   aktivan BOOLEAN NOT NULL,
   uloga VARCHAR(20) NOT NULL,
   PRIMARY KEY (idKorisnika),
@@ -88,6 +87,7 @@ CREATE TABLE TERMIN
   idTermina INT GENERATED ALWAYS AS IDENTITY,
   vrijemeOd TIMESTAMP NOT NULL,
   vrijemeDo TIMESTAMP NOT NULL,
+  status VARCHAR(30) NOT NULL,
   idPlovila INT NOT NULL,
   PRIMARY KEY (idTermina),
   FOREIGN KEY (idPlovila) REFERENCES PLOVILO(idPlovila)
@@ -99,11 +99,8 @@ CREATE TABLE REZERVACIJA
   iznos NUMERIC(10,2) NOT NULL,
   poslanaObavijest BOOLEAN NOT NULL,
   brojOsoba INT NOT NULL,
-  status VARCHAR(30) NOT NULL,
   datumKreiranja DATE NOT NULL,
-  idLuke INT NOT NULL,
   PRIMARY KEY (idTermina),
-  FOREIGN KEY (idLuke) REFERENCES LUKA(idLuke),
   FOREIGN KEY (idTermina) REFERENCES TERMIN(idTermina)
 );
 
@@ -137,6 +134,7 @@ CREATE TABLE IMADODATNEUSLUGE
 (
   idUsluge INT NOT NULL,
   idTermina INT NOT NULL,
+  cijenaDodatneUsluge NUMERIC(10,2) NOT NULL,
   PRIMARY KEY (idUsluge, idTermina),
   FOREIGN KEY (idUsluge) REFERENCES USLUGA(idUsluge),
   FOREIGN KEY (idTermina) REFERENCES REZERVACIJA(idTermina)
@@ -146,10 +144,14 @@ CREATE TABLE IMADODATNUOPREMU
 (
   idOpreme INT NOT NULL,
   idTermina INT NOT NULL,
+  kolicinaOpreme INT NOT NULL,
+  cijenaDodatneOpreme NUMERIC(10,2) NOT NULL,
   PRIMARY KEY (idOpreme, idTermina),
   FOREIGN KEY (idOpreme) REFERENCES OPREMA(idOpreme),
   FOREIGN KEY (idTermina) REFERENCES REZERVACIJA(idTermina)
 );
+
+--CONSTRAINTS
 
 ALTER TABLE KORISNIK
 	ADD CONSTRAINT nepostojeca_uloga CHECK(
@@ -161,10 +163,20 @@ ALTER TABLE USLUGA
 		cijenaUsluge >= 0
 	);
 
+ALTER TABLE IMADODATNEUSLUGE
+	ADD CONSTRAINT pozitivna_cijena_dodUsluge CHECK(
+		cijenaDodatneUsluge >=0
+	);
+
 ALTER TABLE OPREMA
 	ADD CONSTRAINT pozitivna_cijena_opreme CHECK(
 		cijenaNajma >= 0
 	);
+
+ALTER TABLE IMADODATNUOPREMU
+	ADD CONSTRAINT pozitivne_vrijednosti_opreme CHECK(
+		kolicinaOpreme >= 0 AND
+		cijenaDodatneOpreme >= 0);
 
 ALTER TABLE PLOVILO  
 	ADD CONSTRAINT pozitivne_vrijednosti CHECK(
@@ -186,9 +198,9 @@ ALTER TABLE REZERVACIJA
 		brojOsoba > 0
 	);
 
-ALTER TABLE REZERVACIJA
+ALTER TABLE TERMIN
 	ADD CONSTRAINT nepostojec_status CHECK(
-		status IN ('ZAHTJEV', 'POTVRDENA', 'OTKAZANA', 'ZAVRSENA')
+		status IN ('ZAHTJEV', 'POTVRDENA', 'OTKAZANA', 'ZAVRSENA', 'NEDOSTUPAN TERMIN')
 	);
 
 ALTER TABLE TERMIN
@@ -200,4 +212,99 @@ ALTER TABLE TERMIN
 	ADD CONSTRAINT slobodan_termin EXCLUDE USING gist (
 		idplovila WITH =, 
 		TSRANGE(vrijemeOd, vrijemeDo) WITH &&
-	);
+	) WHERE (status <> 'OTKAZANA');
+
+--FUNCTIONS AND TRIGGERS
+--ova funkcija i trigger sprječavaju da se više korisnika veže na istu rezervaciju
+CREATE FUNCTION trg_check_UserReservation() RETURNS trigger AS
+$$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM korisnik_rezervacija kr
+        NATURAL JOIN korisnik k
+        WHERE k.uloga = 'KORISNIK'
+          AND kr.idTermina = NEW.idTermina
+          AND kr.idKorisnika <> NEW.idKorisnika
+    ) THEN
+        RAISE EXCEPTION 'Error: nije dozvoljeno vezati više korisnika na istu rezervaciju.';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER chk_korisnik_rezervacija
+	BEFORE INSERT OR UPDATE ON korisnik_rezervacija 
+	FOR EACH ROW
+	EXECUTE FUNCTION trg_check_UserReservation();
+
+	
+--ova funkcija i trigger sprječavaju da u tablici rezervacija postoji rezervacija s statusom nedostupnog termina
+CREATE FUNCTION trg_check_ReservationStatus() RETURNS trigger AS
+$$
+	DECLARE 
+		status termin.status%TYPE;
+	BEGIN
+		status := (SELECT status FROM termin WHERE termin.idtermina = NEW.idtermina);
+		IF(status = 'NEDOSTUPAN TERMIN') THEN
+			RAISE EXCEPTION 'Error: rezervacija ne smije imati status "NEDOSTUPAN TERMIN"';
+			RETURN NULL;
+		ELSE
+			RETURN NEW;
+		END IF;
+	END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER chk_status_rezervacije
+	BEFORE INSERT OR UPDATE ON rezervacija
+	FOR EACH ROW
+	EXECUTE FUNCTION trg_check_ReservationStatus();
+
+	
+--ova funkcija i trigger sprječavaju da u tablici nedostupanTermin postoji termin koji nema status nedostupnog termina
+CREATE FUNCTION trg_check_UnavailableTerminStatus() RETURNS trigger AS
+$$
+	DECLARE 
+		status termin.status%TYPE;
+	BEGIN
+		status := (SELECT status FROM termin WHERE termin.idtermina = NEW.idtermina);
+		IF(status <> 'NEDOSTUPAN TERMIN') THEN
+			RAISE EXCEPTION 'Error: nedostupan termin smije imati samo status "NEDOSTUPAN TERMIN"';
+			RETURN NULL;
+		ELSE
+			RETURN NEW;
+		END IF;
+	END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER chk_status_nedostupnog_termina
+	BEFORE INSERT OR UPDATE ON nedostupnitermin
+	FOR EACH ROW
+	EXECUTE FUNCTION trg_check_UnavailableTerminStatus();
+
+--ova funkcija i trigger sprječavaju da se u tablici termin status nekog termina promijeni u nedostupan termin ako se nalazi
+-- u tablici rezervacija i obrnuto
+CREATE FUNCTION trg_check_terminStatus() RETURNS trigger AS
+$$
+	BEGIN
+		IF(NEW.status = 'NEDOSTUPAN TERMIN' AND 
+			EXISTS(SELECT 1 FROM rezervacija WHERE idTermina = NEW.idTermina))
+			THEN
+				RAISE EXCEPTION 'Error: nije dozvoljeno promijeniti status postojeće rezervacije u "NEDOSTUPAN TERMIN"';
+				RETURN NULL;
+		ELSIF(NEW.status <> 'NEDOSTUPAN TERMIN' AND
+			EXISTS(SELECT 1 FROM nedostupantermin WHERE idTermina = NEW.idTermina))
+			THEN
+				RAISE EXCEPTION 'Error: nije dozvoljeno promijeniti status postojećeg nedostupnog termina';
+				RETURN NULL;
+		ELSE
+			RETURN NEW;
+		END IF;
+	END;
+$$LANGUAGE plpgsql;
+
+CREATE TRIGGER chk_status_termin
+	BEFORE UPDATE OF status ON termin
+	FOR EACH ROW
+	EXECUTE FUNCTION trg_check_terminStatus();
