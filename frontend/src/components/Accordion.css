@@ -13,5 +13,5 @@
 
 .accordion-header
 {
-    @apply font-title text-base flex flex-row items-center
+    @apply font-title text-base flex flex-row items-center pointer-events-none mb-2
 }

@@ -3,8 +3,7 @@ import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 import 'leaflet/dist/leaflet.css'
 import {useEffect, useMemo, useState} from "react";
 import "./Map.css"
-import {Icon} from "leaflet/src/layer/index.js";
-import markerSvg from "../assets/marker.svg"
+import {DivIcon} from "leaflet/src/layer/index.js";
 import placeholder from "../assets/placeholder.svg"
 
 
@@ -30,14 +29,16 @@ function VesselCard(vessel)
 }
 function HarborMarker({ position, name }) {
     const [vesselCards, SetVesselCards] = useState("")
-    const icon = new Icon({
-        iconUrl: markerSvg,
-        iconSize:     [50, 50], // size of the icon
-        shadowSize:   [0, 0], // size of the shadow
-        iconAnchor:   [25, 25], // point of the icon which will correspond to marker's location
-        shadowAnchor: [50, 50],  // the same for the shadow
-        popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
-    });
+
+    useEffect(() => {
+       fetch("/api/filter", {
+            method: "POST",
+            body: JSON.stringify({ harborName: name }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        }).then(x => x.json()).then(json => SetVesselCards(json.map(x => VesselCard(x))))
+    }, []);
     const eventHandlers = useMemo(() => ({
         async popupopen() {
             const response = await fetch("/api/filter", {
@@ -49,11 +50,12 @@ function HarborMarker({ position, name }) {
             })
             const json = await response.json()
             SetVesselCards(json.map(x => VesselCard(x)))
-        },
+        }
     }), [name])
 
+    const divIcon = new DivIcon({className: "marker", html: vesselCards.length})
     return (
-        <Marker eventHandlers={eventHandlers} position={position}  icon={icon}>
+        <Marker eventHandlers={eventHandlers} position={position} icon={divIcon}>
             <Popup closeButton={false}>
                 <div className={"absolute -top-8 w-auto h-16 -z-1 bg-white rounded-xl text-2xl pl-1 pr-1"}>
                     {name}
@@ -85,9 +87,9 @@ function Map() {
     const position = [44.08714036163615, 15.150380435125484]
 
     return (<>
-        <div className={"h-dvh w-dvw flex-col"}>
+        <div className={"h-full flex flex-col"}>
             <Header/>
-            <MapContainer id="map" className={"h-dvh"} center={position} zoom={13} scrollWheelZoom={true}>
+            <MapContainer id="map" className={"h-full"} center={position} zoom={13} scrollWheelZoom={true} zoomControl={false}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.thunderforest.com/" target="_blank">Thunderforest</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://api.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=100a2a4b0a6a4f76846b12b31fc115ff"
