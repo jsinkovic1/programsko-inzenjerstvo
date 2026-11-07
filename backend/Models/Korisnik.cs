@@ -15,8 +15,6 @@ public partial class Korisnik
 
     public string Mail { get; set; } = null!;
 
-    public DateOnly Datumrodenja { get; set; }
-
     public bool Aktivan { get; set; }
 
     public string Uloga { get; set; } = null!;

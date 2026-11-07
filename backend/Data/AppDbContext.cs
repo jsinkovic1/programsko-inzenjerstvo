@@ -79,7 +79,6 @@ public partial class AppDbContext : DbContext
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("idkorisnika");
             entity.Property(e => e.Aktivan).HasColumnName("aktivan");
-            entity.Property(e => e.Datumrodenja).HasColumnName("datumrodenja");
             entity.Property(e => e.Ime)
                 .HasMaxLength(50)
                 .HasColumnName("ime");
@@ -250,19 +249,10 @@ public partial class AppDbContext : DbContext
                     .HasColumnName("idtermina");
                 entity.Property(e => e.Brojosoba).HasColumnName("brojosoba");
                 entity.Property(e => e.Datumkreiranja).HasColumnName("datumkreiranja");
-                entity.Property(e => e.Idluke).HasColumnName("idluke");
                 entity.Property(e => e.Iznos)
                     .HasPrecision(10, 2)
                     .HasColumnName("iznos");
                 entity.Property(e => e.Poslanaobavijest).HasColumnName("poslanaobavijest");
-                entity.Property(e => e.Status)
-                    .HasMaxLength(30)
-                    .HasColumnName("status");
-
-                entity.HasOne(d => d.Luka).WithMany(p => p.Rezervacije)
-                    .HasForeignKey(d => d.Idluke)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("rezervacija_idluke_fkey");
 
                 entity.HasOne(d => d.Termin).WithOne(p => p.Rezervacija)
                     .HasForeignKey<Rezervacija>(d => d.Idtermina)
@@ -300,6 +290,9 @@ public partial class AppDbContext : DbContext
                 entity.Property(e => e.Vrijemeod)
                     .HasColumnType("timestamp without time zone")
                     .HasColumnName("vrijemeod");
+                entity.Property(e => e.Status)
+                    .HasMaxLength(30)
+                    .HasColumnName("status");
 
                 entity.HasOne(d => d.Plovilo).WithMany(p => p.Termini)
                     .HasForeignKey(d => d.Idplovila)
@@ -361,6 +354,7 @@ public partial class AppDbContext : DbContext
 
                 entity.Property(e => e.idtermina).UseIdentityAlwaysColumn().HasColumnName("idtermina");
                 entity.Property(e => e.idusluge).UseIdentityAlwaysColumn().HasColumnName("idusluge");
+                entity.Property(e => e.cijenadodatneusluge).HasPrecision(10, 2).HasColumnName("cijenadodatneusluge");
 
                 entity.HasOne(d => d.Usluga).WithMany().HasForeignKey(d => d.idusluge);
                 entity.HasOne(d => d.Rezervacija).WithMany().HasForeignKey(e => e.idtermina);
@@ -373,6 +367,8 @@ public partial class AppDbContext : DbContext
 
                 entity.Property(e => e.idopreme).UseIdentityAlwaysColumn().HasColumnName("idopreme");
                 entity.Property(e => e.idtermina).UseIdentityAlwaysColumn().HasColumnName("idtermina");
+                entity.Property(e => e.kolicinaopreme).HasColumnName("kolicinaopreme");
+                entity.Property(e => e.cijenadodatneopreme).HasPrecision(10, 2).HasColumnName("cijenadodatneopreme");
 
                 entity.HasOne(d => d.Oprema).WithMany().HasForeignKey(d => d.idopreme);
                 entity.HasOne(d => d.Rezervacija).WithMany().HasForeignKey(d => d.idtermina);
