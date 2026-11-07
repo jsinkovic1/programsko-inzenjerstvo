@@ -40,5 +40,5 @@ jobs:
           script: |
             sudo docker stop charter-testdb
             sudo docker load -i database/charter-testdb
-            sudo docker system prune -a -f
+            sudo docker system prune -f
             sudo docker run -d -e POSTGRES_PASSWORD=${{ secrets.TESTDB_DEFAULT_PASSWORD }} --name charter-testdb -p 5433:5432 --rm charter/database:testing postgres
