@@ -14,7 +14,6 @@ jobs:
       - name: Pre-build setup
         run: |
           echo "${{ secrets.TESTDB_CREATE_USERS_SQL }}" >> "db/zzz-charter-database-users.sql"
-          docker build -o type=oci,dest=build/charter-testdb -f db/Dockerfile --tag charter/database:testing ./db
 
       - name: Build with Docker
         run: |
