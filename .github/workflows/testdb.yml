@@ -10,6 +10,11 @@ jobs:
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v5
+        
+      - name: Pre-build setup
+        run: |
+          echo "${{ secrets.TESTDB_CREATE_USERS_SQL }}" >> "db/zzz-charter-database-users.sql"
+          docker build -o type=oci,dest=build/charter-testdb -f db/Dockerfile --tag charter/database:testing ./db
 
       - name: Build with Docker
         run: |
@@ -25,3 +30,15 @@ jobs:
           port: "22"
           user: "ubuntu"
           key: ${{ secrets.SERVER_LOGIN }}
+          
+      - name: Load image and restart test database server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: "ec2-16-192-213-81.eu-north-1.compute.amazonaws.com"
+          username: "ubuntu"
+          key: ${{ secrets.SERVER_LOGIN }}
+          port: "22"
+          script: |
+            sudo docker stop charter-testdb
+            sudo docker load -i database/charter-testdb
+            sudo docker run -d --name charter-testdb -p 5433:5432 --rm charter/database:testing postgres
