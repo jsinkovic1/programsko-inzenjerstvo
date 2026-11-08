@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@rc-component/slider": "^1.2.1",
     "@tailwindcss/vite": "^4.3.3",
     "leaflet": "^1.9.4",
     "react": "^19.0.0-rc.1",
