@@ -1,0 +1,38 @@
+﻿@import "tailwindcss";
+
+.range-slider-container
+{
+    display: grid;
+    grid-template-rows: 0 0 0;
+}
+
+.range-slider
+{
+    -webkit-appearance: none;
+    appearance: none;
+    @apply rounded-full h-2 w-full bg-transparent z-2 pointer-events-none
+}
+
+.range-slider-track
+{
+    @apply rounded-full h-2 w-full bg-gray-300 pointer-events-none
+}
+
+.range-slider-fill
+{
+    transform-origin: center left;
+    @apply rounded-full h-2 bg-blue-900 z-1 pointer-events-none
+}
+
+.range-slider::-webkit-slider-runnable-track, .range-slider::-moz-range-progress
+{
+    -webkit-appearance: none;
+    appearance: none;
+    @apply rounded-full h-2 w-full bg-transparent
+}
+
+.range-slider::-webkit-slider-thumb, .range-slider::-moz-range-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    @apply w-5 h-5 rounded-full z-20 pointer-events-auto;
+}

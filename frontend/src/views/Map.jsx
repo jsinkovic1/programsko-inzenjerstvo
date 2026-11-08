@@ -5,6 +5,7 @@ import {useEffect, useMemo, useState} from "react";
 import "./Map.css"
 import {DivIcon} from "leaflet/src/layer/index.js";
 import placeholder from "../assets/placeholder.svg"
+import Accordion from "../components/Accordion.jsx";
 
 
 function VesselCard(vessel)
@@ -38,7 +39,7 @@ function HarborMarker({ position, name }) {
                 "Content-type": "application/json; charset=UTF-8"
             }
         }).then(x => x.json()).then(json => SetVesselCards(json.map(x => VesselCard(x))))
-    }, []);
+    }, [name]);
     const eventHandlers = useMemo(() => ({
         async popupopen() {
             const response = await fetch("/api/filter", {
@@ -90,6 +91,12 @@ function Map() {
         <div className={"h-full flex flex-col"}>
             <Header/>
             <MapContainer id="map" className={"h-full"} center={position} zoom={13} scrollWheelZoom={true} zoomControl={false}>
+                <div className={"w-70 absolute z-1000 flex flex-col gap-2 p-2"}>
+                    <input type="text" placeholder={"Naziv plovila"} className="text-input"/>
+                    <Accordion header={"Filter"}>
+                        <p>test test</p>
+                    </Accordion>
+                </div>
                 <TileLayer
                     attribution='&copy; <a href="https://www.thunderforest.com/" target="_blank">Thunderforest</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://api.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=100a2a4b0a6a4f76846b12b31fc115ff"

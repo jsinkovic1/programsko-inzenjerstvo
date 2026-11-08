@@ -11,14 +11,19 @@
     @apply font-sans text-base bg-gray-100 border-1 border-gray-400 hover:bg-gray-200 focus:bg-gray-400 rounded-md shadow-md p-2
 }
 
-.primary
+.fill-primary
+{
+    @apply bg-blue-900 hover:bg-blue-800 focus:bg-blue-950 text-white
+}
+
+.fill-accent
 {
     @apply bg-yellow-400 hover:bg-yellow-500 focus:bg-yellow-700
 }
 
 .text-input
 {
-    @apply font-sans border-2 bg-gray-100 hover:bg-gray-200 focus:bg-gray-100 focus:outline-none border-transparent focus:border-yellow-500 rounded-md shadow-md p-2
+    @apply font-sans text-base border-2 bg-gray-100 hover:bg-gray-200 focus:bg-gray-100 focus:outline-none border-transparent focus:border-yellow-500 rounded-md shadow-md p-2
 }
 
 /*dodano da slike u "galeriji" imaju zaobljene rubove*/

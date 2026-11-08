@@ -1,6 +1,8 @@
 ﻿import "../App.css"
 import {useNavigate} from "react-router-dom";
 import Accordion from "../components/Accordion.jsx";
+import Slider from "../components/Slider.jsx";
+import RangeSlider from "../components/RangeSlider.jsx";
 
 function Gallery() {
     var nav = useNavigate()
@@ -10,19 +12,23 @@ function Gallery() {
                 <button onClick={() => nav("/map")} className={"button"}>
                     Button
                 </button>
-
-                <button onClick={() => nav("/map")} className={"button primary"}>
-                    Button (primary)
+                <button onClick={() => nav("/map")} className={"button fill-primary"}>
+                    Button (primary fill)
+                </button>
+                <button onClick={() => nav("/map")} className={"button fill-accent"}>
+                    Button (accent fill)
                 </button>
                 <Accordion header={"Accordion"}>
-                    <button onClick={() => nav("/map")} className={"button primary"}>
+                    <button onClick={() => nav("/map")} className={"button fill-primary"}>
                         Lorem ipsum
                     </button>
-                    <button onClick={() => nav("/map")} className={"button primary"}>
+                    <button onClick={() => nav("/map")} className={"button fill-primary"}>
                         Lorem ipsum
                     </button>
                 </Accordion>
-                <input type="text" placeholder={"Placeholder"} className="text-input"/>
+                <input type="text" placeholder={"Text input"} className="text-input"/>
+                <Slider min={0} max={100} step={1}/>
+                <RangeSlider min={0} max={100} step={1}/>
             </div>
 
         </div>
