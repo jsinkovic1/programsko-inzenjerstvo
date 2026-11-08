@@ -20,3 +20,22 @@
 {
     @apply font-sans border-2 bg-gray-100 hover:bg-gray-200 focus:bg-gray-100 focus:outline-none border-transparent focus:border-yellow-500 rounded-md shadow-md p-2
 }
+
+/*dodano da slike u "galeriji" imaju zaobljene rubove*/
+
+.image-gallery-content, .image-gallery-slide, .image-gallery-image {
+  border-radius: 0.5rem;
+  overflow: hidden
+}
+
+.image-gallery-thumbnail img {
+    border-radius: 0.5rem;
+    cursor: pointer
+}
+
+.image-gallery-thumbnail,
+.image-gallery-thumbnail.active,
+.image-gallery-thumbnail:focus {
+    border-radius: 0.5rem;
+    
+}
