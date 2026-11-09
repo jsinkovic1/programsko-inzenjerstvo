@@ -18,7 +18,7 @@
 
 .fill-accent
 {
-    @apply bg-yellow-400 hover:bg-yellow-500 focus:bg-yellow-700
+    @apply bg-yellow-500 hover:bg-yellow-400 focus:bg-yellow-700 
 }
 
 .text-input
