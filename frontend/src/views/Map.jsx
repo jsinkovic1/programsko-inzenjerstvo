@@ -95,6 +95,9 @@ function Map() {
                     <input type="text" placeholder={"Naziv plovila"} className="text-input"/>
                     <Accordion header={"Filter"}>
                         <p>test test</p>
+                        <p>test test</p>
+                        <p>test test</p>
+                        <p>test test</p>
                     </Accordion>
                 </div>
                 <TileLayer

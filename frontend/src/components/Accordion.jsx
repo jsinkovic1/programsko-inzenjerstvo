@@ -22,8 +22,9 @@ class Accordion extends Component {
                     {this.state.collapsed ? <FaPlus className={"mr-1"} /> : <FaMinus className={"mr-1"}/>}
                     {this.props.header}
                 </div>
-
-                {this.props.children}
+                <div className={"accordion-content-wrapper"}>
+                    {this.props.children}
+                </div>
             </div>)
     }
 
