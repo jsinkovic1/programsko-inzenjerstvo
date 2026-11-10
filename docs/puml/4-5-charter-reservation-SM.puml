@@ -1,0 +1,61 @@
+@startuml
+title Stanja rezervacije
+
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #212529
+
+skinparam state {
+    BackgroundColor #E7F1FF
+    BorderColor #0D6EFD
+}
+
+skinparam note {
+    BackgroundColor #F8F9FA
+    BorderColor #212529
+    FontColor #212529
+}
+
+state "Zauzima termin plovila" as Zauzima {
+  state "ZAHTJEV\n(zahtjev za rezervaciju)" as ZAHTJEV
+  state "POTVRDENA\n(potvrđena)" as POTVRDENA
+}
+
+state "OTKAZANA\n(otkazana)" as OTKAZANA
+state "ZAVRSENA\n(završeni najam)" as ZAVRSENA
+
+[*] --> ZAHTJEV : klijent šalje zahtjev\n[termin slobodan] / pohrani iznos
+
+ZAHTJEV --> ZAHTJEV : klijent mijenja zahtjev\n[novi termin slobodan] / ponovno izračunaj iznos
+
+ZAHTJEV --> POTVRDENA : administrator potvrđuje\n/ pošalji potvrdu e-poštom
+ZAHTJEV --> OTKAZANA : klijent povlači zahtjev\n/ pošalji obavijest o otkazivanju
+ZAHTJEV --> OTKAZANA : administrator odbija\n/ pošalji obavijest o odbijanju
+
+POTVRDENA --> OTKAZANA : klijent otkazuje [sada < preuzimanje]\n/ pošalji obavijest o otkazivanju
+POTVRDENA --> OTKAZANA : administrator otkazuje\n/ pošalji obavijest o otkazivanju
+POTVRDENA --> ZAVRSENA : [sada >= povrat]\n(automatski)
+
+OTKAZANA --> [*]
+ZAVRSENA --> [*]
+
+note right of OTKAZANA
+  Termin plovila se oslobađa;
+  nova rezervacija može ga zauzeti.
+end note
+
+note right of ZAVRSENA
+  Prikaz i statistika tretiraju istekle
+  potvrđene rezervacije kao završene;
+  pozadinski posao povremeno trajno
+  upisuje promjenu u bazu.
+end note
+
+note left of Zauzima
+  Ostali prijelazi (npr. OTKAZANA -> POTVRDENA,
+  ZAHTJEV -> ZAVRSENA, POTVRDENA -> ZAHTJEV)
+  odbijaju se. Potvrđena se ne mijenja
+  izravno: klijent je otkazuje i izrađuje
+  novi zahtjev.
+end note
+@enduml

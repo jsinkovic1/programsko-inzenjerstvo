@@ -1,0 +1,86 @@
+@startuml
+title Potvrda rezervacije i slanje e-pošte (UC-009)
+
+skinparam maxMessageSize 160
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+skinparam ArrowColor #212529
+
+skinparam sequence {
+    ParticipantBackgroundColor #E7F1FF
+    ParticipantBorderColor #0D6EFD
+    ActorBackgroundColor #F8F9FA
+    ActorBorderColor #212529
+    LifeLineBorderColor #212529
+}
+
+autonumber
+
+' ==============================================================================
+' Sudionici
+' ==============================================================================
+actor "Administrator" as Admin
+participant "Web-klijent" as Web <<UI>>
+participant "RezervacijaController" as API <<API>>
+participant "RezervacijaService" as Service <<Application>>
+database "PostgreSQL" as DB <<Persistence>>
+participant "IObavijestiService" as Obav <<Port>>
+participant "Servis za e-poštu" as Mail <<External>>
+
+' ==============================================================================
+' Potvrda i pohrana
+' ==============================================================================
+Admin -> Web ++ : potvrdi odabrani zahtjev
+Web -> API ++ : POST /api/rezervacija/{id}/potvrda
+
+alt korisnik nema ulogu administratora
+  API --> Web : 403 Forbidden
+  Web --> Admin : radnja nije dopuštena
+
+else administrator je autoriziran
+  API -> Service ++ : Potvrdi(idTermina)
+  Service -> DB ++ : dohvati rezervaciju, stavke i dodijeljene djelatnike
+  DB --> Service -- : rezervacija
+
+  alt status nije ZAHTJEV
+    Service --> API : NedopustenPrijelazIznimka
+    API --> Web : 409 Conflict
+    Web --> Admin : rezervacija je već obrađena
+
+  else prijelaz ZAHTJEV -> POTVRDENA je dopušten
+    Service -> Service : provjeri specijalnosti i preklapanja\ndodijeljenih djelatnika (F-014)
+    note right of Service
+      Upozorenja su informativna (AS-14):
+      potvrda se nastavlja.
+    end note
+    Service -> DB ++ : UPDATE status = POTVRDENA; COMMIT
+    DB --> Service -- : uspjeh
+
+    ' ==========================================================================
+    ' Slanje e-pošte nakon pohrane (NF-04)
+    ' ==========================================================================
+    Service -> Obav ++ : PosaljiPotvrdu(rezervacija)
+    Obav -> Mail ++ : poruka (plovilo, razdoblje, usluge,\niznos, mjesto preuzimanja)
+
+    alt slanje uspjelo
+      Mail --> Obav : prihvaćeno
+      Obav --> Service : true
+      Service -> DB : poslanaObavijest = TRUE
+
+    else servis nedostupan ili istek vremena
+      Mail --> Obav -- : pogreška / timeout
+      Obav --> Service -- : false (zapis u dnevnik)
+      note right of Service
+        Status ostaje POTVRDENA;
+        poslanaObavijest ostaje FALSE
+        pa administrator vidi neuspjeh.
+      end note
+    end
+
+    Service --> API -- : RezultatPotvrde (upozorenja, obavijestPoslana)
+    API --> Web -- : 200 OK
+    Web --> Admin -- : potvrđeno; prikaži upozorenja\ni stanje slanja e-pošte
+  end
+end
+@enduml

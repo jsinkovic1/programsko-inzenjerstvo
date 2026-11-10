@@ -1,0 +1,173 @@
+@startuml
+title Sustav za charter poslovanje – model podataka
+
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #212529
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 70
+
+skinparam entity {
+    BackgroundColor #E7F1FF
+    BorderColor #0D6EFD
+    FontColor #212529
+}
+
+hide circle
+
+' ==============================================================================
+' Plovila i šifrarnici
+' ==============================================================================
+
+entity "LUKA" as Luka {
+    * idLuke : INT <<PK>>
+    --
+    * nazivLuke : VARCHAR(100)
+    * mjesto : VARCHAR(100)
+    * latituda : NUMERIC(9,6)
+    * longituda : NUMERIC(9,6)
+}
+
+entity "TIPPLOVILA" as Tip {
+    * idTipaPlovila : INT <<PK>>
+    --
+    * nazivTipaPlovila : VARCHAR(50)
+}
+
+entity "PROIZVODAC" as Proizvodac {
+    * idProizvodaca : INT <<PK>>
+    --
+    * nazivProizvodaca : VARCHAR(100)
+}
+
+entity "PLOVILO" as Plovilo {
+    * idPlovila : INT <<PK>>
+    --
+    * nazivPlovila : VARCHAR(100)
+    * godinaProizvodnje : INT
+    * kapacitet : INT
+    * brojKabina : INT
+    * brojLezajeva : INT
+    * model : VARCHAR(50)
+    * dnevnaCijenaNajma : NUMERIC(10,2)
+    * idLuke : INT <<FK>>
+    * idTipaPlovila : INT <<FK>>
+    * idProizvodaca : INT <<FK>>
+}
+
+entity "FOTOGRAFIJA" as Fotografija {
+    * idFotografije : INT <<PK>>
+    --
+    * url : VARCHAR(255)
+    * glavnaSlika : BOOLEAN
+    * idPlovila : INT <<FK>>
+}
+
+entity "OPREMA" as Oprema {
+    * idOpreme : INT <<PK>>
+    --
+    * nazivOpreme : VARCHAR(100)
+    * cijenaNajma : NUMERIC(10,2)
+}
+
+entity "IMAOPREMU" as ImaOpremu {
+    * idPlovila : INT <<PK, FK>>
+    * idOpreme : INT <<PK, FK>>
+}
+
+entity "USLUGA" as Usluga {
+    * idUsluge : INT <<PK>>
+    --
+    * nazivUsluge : VARCHAR(100)
+    * cijenaUsluge : NUMERIC(10,2)
+}
+
+' ==============================================================================
+' Termini zauzetosti (nadtip) i podtipovi
+' ==============================================================================
+
+entity "TERMIN" as Termin {
+    * idTermina : INT <<PK>>
+    --
+    * vrijemeOd : TIMESTAMP
+    * vrijemeDo : TIMESTAMP
+    * idPlovila : INT <<FK>>
+    ..
+    EXCLUDE (idPlovila =, TSRANGE(vrijemeOd, vrijemeDo) &&)
+}
+
+entity "REZERVACIJA" as Rezervacija {
+    * idTermina : INT <<PK, FK>>
+    --
+    * iznos : NUMERIC(10,2)
+    * poslanaObavijest : BOOLEAN
+    * brojOsoba : INT
+    * status : VARCHAR(30)
+    * datumKreiranja : DATE
+    * idLuke : INT <<FK>>
+}
+
+entity "NEDOSTUPNITERMIN" as Nedostupni {
+    * idTermina : INT <<PK, FK>>
+    --
+    * opis : VARCHAR(255)
+}
+
+' ==============================================================================
+' Korisnici i stavke rezervacije
+' ==============================================================================
+
+entity "KORISNIK" as Korisnik {
+    * idKorisnika : INT <<PK>>
+    --
+    * username : VARCHAR(50) <<UNIQUE>>
+    * ime : VARCHAR(50)
+    * prezime : VARCHAR(50)
+    * mail : VARCHAR(100) <<UNIQUE>>
+    * datumRodenja : DATE
+    * aktivan : BOOLEAN
+    * uloga : VARCHAR(20)
+}
+
+entity "KORISNIK_REZERVACIJA" as KorRez {
+    * idTermina : INT <<PK, FK>>
+    * idKorisnika : INT <<PK, FK>>
+}
+
+entity "IMADODATNEUSLUGE" as ImaUsluge {
+    * idUsluge : INT <<PK, FK>>
+    * idTermina : INT <<PK, FK>>
+}
+
+entity "IMADODATNUOPREMU" as ImaDodOpremu {
+    * idOpreme : INT <<PK, FK>>
+    * idTermina : INT <<PK, FK>>
+}
+
+' ==============================================================================
+' Veze između entiteta
+' ==============================================================================
+
+Luka ||--o{ Plovilo : matična luka ►
+Tip ||--o{ Plovilo : vrsta ►
+Proizvodac ||--o{ Plovilo : proizvodi ►
+Plovilo ||--o{ Fotografija : ima ►
+
+Plovilo ||--o{ ImaOpremu
+Oprema ||--o{ ImaOpremu
+
+Plovilo ||--o{ Termin : zauzeto u ►
+Termin ||--o| Rezervacija : podtip ►
+Termin ||--o| Nedostupni : podtip ►
+Luka ||--o{ Rezervacija : mjesto preuzimanja ►
+
+Rezervacija ||--o{ KorRez
+Korisnik ||--o{ KorRez
+
+Rezervacija ||--o{ ImaUsluge
+Usluga ||--o{ ImaUsluge
+
+Rezervacija ||--o{ ImaDodOpremu
+Oprema ||--o{ ImaDodOpremu
+@enduml

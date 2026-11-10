@@ -1,0 +1,81 @@
+@startuml
+title Izrada zahtjeva za rezervaciju (UC-004)
+
+skinparam maxMessageSize 160
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+skinparam ArrowColor #212529
+
+skinparam sequence {
+    ParticipantBackgroundColor #E7F1FF
+    ParticipantBorderColor #0D6EFD
+    ActorBackgroundColor #F8F9FA
+    ActorBorderColor #212529
+    LifeLineBorderColor #212529
+}
+
+autonumber
+
+' ==============================================================================
+' Sudionici
+' ==============================================================================
+actor "Klijent" as Klijent
+participant "Web-klijent" as Web <<UI>>
+participant "RezervacijaController" as API <<API>>
+participant "RezervacijaService" as Service <<Application>>
+participant "KalkulatorIznosa" as Kalk <<Domain>>
+database "PostgreSQL" as DB <<Persistence>>
+
+' ==============================================================================
+' Faza 1: odabir stavki i prikaz iznosa (F-007)
+' ==============================================================================
+Klijent -> Web ++ : unesi razdoblje, broj osoba,\nusluge i dodatnu opremu
+Web -> API ++ : POST /api/rezervacija/izracun
+API -> Service ++ : IzracunajIznos(zahtjev)
+Service -> DB ++ : dohvati plovilo i cjenik
+DB --> Service -- : dnevna cijena, cijene stavki
+Service -> Kalk ++ : Izracunaj(cijene, razdoblje, stavke)
+Kalk --> Service -- : broj dana (AS-03), iznos (AS-05)
+Service --> API -- : specifikacija iznosa
+API --> Web -- : 200 OK
+Web --> Klijent : prikaži specifikaciju i ukupni iznos
+
+' ==============================================================================
+' Faza 2: slanje zahtjeva, provjera i pohrana
+' ==============================================================================
+Klijent -> Web : potvrdi slanje zahtjeva
+Web -> API ++ : POST /api/rezervacija (sesijski kolačić)
+
+alt korisnik nije prijavljen ili nema ulogu klijenta
+  API --> Web : 401 Unauthorized / 403 Forbidden
+  Web --> Klijent : uputi na prijavu (UC-001)
+
+else klijent je autoriziran
+  API -> Service ++ : IzradiZahtjev(idKlijenta, zahtjev)
+
+  alt neispravan unos (povrat <= preuzimanje, preuzimanje u prošlosti,\nbroj osoba > kapacitet, neaktivno plovilo)
+    Service --> API : ValidacijskaIznimka
+    API --> Web : 400 Bad Request (poruke po poljima)
+    Web --> Klijent : označi neispravna polja
+
+  else unos je ispravan
+    Service -> Kalk ++ : Izracunaj(...)
+    Kalk --> Service -- : iznos
+    Service -> DB ++ : BEGIN; INSERT TERMIN; INSERT REZERVACIJA (ZAHTJEV, iznos);\nINSERT stavke; COMMIT
+
+    alt termin se preklapa (istodobni zahtjev ili rezervacija u međuvremenu)
+      DB --> Service : ograničenje odbija preklapajući termin, ROLLBACK
+      Service --> API : TerminZauzetIznimka
+      API --> Web : 409 Conflict
+      Web --> Klijent : plovilo je u međuvremenu zauzeto,\npredloži drugi termin
+
+    else pohrana uspjela
+      DB --> Service -- : idTermina
+      Service --> API -- : rezervacija
+      API --> Web -- : 201 Created
+      Web --> Klijent -- : potvrda zaprimljenog zahtjeva
+    end
+  end
+end
+@enduml

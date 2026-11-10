@@ -1,0 +1,90 @@
+@startuml
+title Sustav za charter poslovanje – komponente
+
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam componentStyle rectangle
+skinparam ArrowColor #212529
+skinparam nodesep 40
+skinparam ranksep 60
+
+skinparam component {
+    BackgroundColor #E7F1FF
+    BorderColor #0D6EFD
+}
+
+skinparam database {
+    BackgroundColor #FFF3CD
+    BorderColor #212529
+}
+
+' ==============================================================================
+' Granica sustava i unutarnje komponente
+' ==============================================================================
+
+rectangle "Sustav za charter poslovanje" {
+
+  component "Web-klijent\n(React SPA)" as Web
+
+  rectangle "Poslužiteljska aplikacija (ASP.NET Core Web API)" {
+    component "REST API\n(kontroleri)" as API
+    component "Autentifikacija\ni autorizacija" as Auth
+    component "Katalog i pretraga\nplovila" as Katalog
+    component "Rezervacije\n(izračun iznosa, statusi)" as Rez
+    component "Upravljanje flotom\ni cjenikom" as Flota
+    component "Korisnici\ni uloge" as Korisnici
+    component "Raspored\npreuzimanja i povrata" as Raspored
+    component "Statistika\ni izvoz CSV" as Stat
+    component "Obavijesti\n(e-pošta)" as Obavijesti
+    component "Vremenska\nprognoza" as Prognoza
+    component "Završetak najma\n(pozadinski posao)" as Zavrsetak
+    component "Pristup podacima\n(EF Core, AppDbContext)" as Data
+  }
+
+  database "PostgreSQL\n(btree_gist)" as DB
+}
+
+' ==============================================================================
+' Vanjski sustavi
+' ==============================================================================
+
+component "AAI@EduHr\n(vanjski, OAuth 2.0)" as AAI
+component "Servis za e-poštu\n(vanjski)" as Mail
+component "Meteorološki servis\n(vanjski)" as Meteo
+component "Kartografski servis\n(vanjski)" as Maps
+
+' ==============================================================================
+' Ovisnosti i sučelja
+' ==============================================================================
+
+Web --> API : HTTPS, JSON (REST)
+Web --> Maps : kartografske pločice\ni oznaka luke
+Web ..> AAI : preusmjeravanje\nna prijavu
+
+API --> Auth : identitet i uloga\nkorisnika
+API --> Katalog : pretraga, detalji,\nkalendar zauzetosti
+API --> Rez : izrada, izmjena,\npotvrda, otkazivanje
+API --> Flota : plovila, luke, usluge,\noprema, nedostupnost
+API --> Korisnici : uloge, specijalnosti,\naktivnost računa
+API --> Raspored : potvrđene rezervacije\nza razdoblje
+API --> Stat : pokazatelji\ni CSV datoteka
+API --> Prognoza : prognoza za luku\ni razdoblje
+
+Auth --> AAI : autorizacijski kod,\nidentitet korisnika
+Auth --> Korisnici : stvaranje računa\npri prvoj prijavi
+
+Rez --> Obavijesti : promjena statusa\n(nakon pohrane)
+Obavijesti --> Mail : potvrda, otkazivanje,\nodbijanje
+Prognoza --> Meteo : koordinate luke,\nrazdoblje
+
+Katalog --> Data
+Rez --> Data
+Flota --> Data
+Korisnici --> Data
+Raspored --> Data
+Stat --> Data
+Obavijesti --> Data : ishod slanja
+Zavrsetak --> Data : POTVRDENA → ZAVRSENA\nza istekle najmove
+
+Data --> DB : SQL (Npgsql)
+@enduml
