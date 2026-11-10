@@ -6,11 +6,11 @@
 
 **Cilj:** Prikazati granicu sustava, relevantne aktere i njihove glavne ciljeve u preglednom UML dijagramu obrazaca uporabe.
 
-![Dijagram obrazaca uporabe sustava za charter poslovanje](./assets/diagrams/charter-uml-diagram.svg)
+![Dijagram obrazaca uporabe sustava za charter poslovanje](./assets/diagrams/3-1-charter-system-UC.svg)
 
 **Slika 3.1. Dijagram obrazaca uporabe sustava za charter poslovanje**
 
-**PlantUML izvor:** [izvor](./puml/charter-uml-diagram.puml)
+**PlantUML izvor:** [izvor](./puml/3-1-charter-system-UC.puml)
 
 **Provjera dijagrama:** Dijagram prikazuje primarne ljudske aktere (posjetitelj, klijent, djelatnik, voditelj charter tvrtke i administrator sustava) te sekundarne vanjske sustave (AAI@EduHr, meteorološki servis, kartografski servis i servis za slanje e-pošte). Svaki akter ima izravno povezane obrasce uporabe u skladu sa svojim ovlastima, pri čemu postupak prijave (UC-001) pokreće posjetitelj kako bi pristupio sustavu, dok je pregled detalja plovila, karte i vremenske prognoze (UC-003) omogućen svim akterima. Odabir dodatnih usluga i dodatne opreme čini sastavni korak obrasca izrade rezervacije, pa je izbjegnuto nepotrebno usložnjavanje dijagrama relacijama `<<extend>>` i `<<include>>`.
 
@@ -62,7 +62,7 @@
 | **Primarni akter** | Klijent (A-02) |
 | **Povezani zahtjevi** | F-007, F-008, F-009, NF-03, AS-01, AS-02, AS-03, AS-05, AS-06 |
 | **Preduvjeti** | Korisnik je prijavljen s ulogom klijenta i odabrao je raspoloživo plovilo. |
-| **Glavni uspješni tok** | 1. Klijent unosi datum i vrijeme preuzimanja i povrata te broj osoba.<br>2. Sustav provjerava ispravnost intervala i provjerava da broj osoba ne premašuje kapacitet plovila.<br>3. Klijent po želji odabire dodatne usluge (jednokratna naknada) i dodatnu opremu uz odabir količine (naplata po danu najma).<br>4. Sustav izračunava i prikazuje specifikaciju ukupnog iznosa.<br>5. Klijent potvrđuje slanje zahtjeva.<br>6. Sustav unutar bazične transakcije ponovno provjerava raspoloživost termina kako bi spriječio preklapanje.<br>7. Sustav zauzima termin u tablici `TERMIN` i sprema rezervaciju u tablicu `REZERVACIJA` sa statusom `ZAHTJEV` te pohranjuje ugovorene cijene stavki.<br>8. Klijentu se prikazuje potvrda o zaprimljenom zahtjevu. |
+| **Glavni uspješni tok** | 1. Klijent unosi datum i vrijeme preuzimanja i povrata te broj osoba.<br>2. Sustav provjerava ispravnost intervala i provjerava da broj osoba ne premašuje kapacitet plovila.<br>3. Klijent po želji odabire dodatne usluge (jednokratna naknada) i dodatnu opremu uz odabir količine (naplata po danu najma).<br>4. Sustav izračunava i prikazuje specifikaciju ukupnog iznosa.<br>5. Klijent potvrđuje slanje zahtjeva.<br>6. Sustav unutar bazične transakcije ponovno provjerava raspoloživost termina kako bi spriječio preklapanje.<br>7. Sustav zauzima termin u tablici `TERMIN` sa statusom `ZAHTJEV`, sprema rezervaciju u tablicu `REZERVACIJA` te pohranjuje ugovorene cijene stavki.<br>8. Klijentu se prikazuje potvrda o zaprimljenom zahtjevu. |
 | **Alternativni tokovi / Iznimke** | **2a — Prekoračen kapacitet plovila ili neispravno vrijeme:** Sustav onemogućuje slanje zahtjeva i označava neispravna polja.<br>**6a — Istodobno zauzeće termina:** U međuvremenu je drugi korisnik poslao zahtjev ili potvrdio rezervaciju za isti termin, ili je administrator unio preklapajuće razdoblje nedostupnosti; transakcija se prekida, a klijent dobiva obavijest da je plovilo u međuvremenu zauzeto. |
 | **Posljedice (ishod)** | Zahtjev za rezervaciju je evidentiran u bazi, termin je označen kao zauzet, a status rezervacije čeka administratorsku obradu. |
 

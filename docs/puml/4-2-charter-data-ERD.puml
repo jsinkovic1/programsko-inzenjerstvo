@@ -92,9 +92,11 @@ entity "TERMIN" as Termin {
     --
     * vrijemeOd : TIMESTAMP
     * vrijemeDo : TIMESTAMP
+    * status : VARCHAR(30)
     * idPlovila : INT <<FK>>
     ..
     EXCLUDE (idPlovila =, TSRANGE(vrijemeOd, vrijemeDo) &&)
+    WHERE status <> 'OTKAZANA'
 }
 
 entity "REZERVACIJA" as Rezervacija {
@@ -103,9 +105,7 @@ entity "REZERVACIJA" as Rezervacija {
     * iznos : NUMERIC(10,2)
     * poslanaObavijest : BOOLEAN
     * brojOsoba : INT
-    * status : VARCHAR(30)
     * datumKreiranja : DATE
-    * idLuke : INT <<FK>>
 }
 
 entity "NEDOSTUPNITERMIN" as Nedostupni {
@@ -125,7 +125,6 @@ entity "KORISNIK" as Korisnik {
     * ime : VARCHAR(50)
     * prezime : VARCHAR(50)
     * mail : VARCHAR(100) <<UNIQUE>>
-    * datumRodenja : DATE
     * aktivan : BOOLEAN
     * uloga : VARCHAR(20)
 }
@@ -138,11 +137,16 @@ entity "KORISNIK_REZERVACIJA" as KorRez {
 entity "IMADODATNEUSLUGE" as ImaUsluge {
     * idUsluge : INT <<PK, FK>>
     * idTermina : INT <<PK, FK>>
+    --
+    * cijenaDodatneUsluge : NUMERIC(10,2)
 }
 
 entity "IMADODATNUOPREMU" as ImaDodOpremu {
     * idOpreme : INT <<PK, FK>>
     * idTermina : INT <<PK, FK>>
+    --
+    * kolicinaOpreme : INT
+    * cijenaDodatneOpreme : NUMERIC(10,2)
 }
 
 ' ==============================================================================
@@ -160,7 +164,6 @@ Oprema ||--o{ ImaOpremu
 Plovilo ||--o{ Termin : zauzeto u ►
 Termin ||--o| Rezervacija : podtip ►
 Termin ||--o| Nedostupni : podtip ►
-Luka ||--o{ Rezervacija : mjesto preuzimanja ►
 
 Rezervacija ||--o{ KorRez
 Korisnik ||--o{ KorRez
