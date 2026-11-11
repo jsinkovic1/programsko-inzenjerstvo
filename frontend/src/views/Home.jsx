@@ -1,5 +1,5 @@
-﻿import "./Home.css";
-import Header from "./Header.jsx";
+﻿import "../App.css";
+import Header from "../components/Header.jsx";
 import { useNavigate } from 'react-router-dom';
 export default function Home() {
   const boatCount = 999;

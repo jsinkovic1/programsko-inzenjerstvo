@@ -1,0 +1,22 @@
+﻿@import "tailwindcss";
+@import "../App.css";
+
+.accordion-collapsed
+{
+    @apply font-sans bg-gray-100 hover:bg-gray-200 focus:bg-gray-400 rounded-md shadow-md p-2 transition-all duration-300 ease-in-out overflow-hidden max-h-10 h-fit gap-2
+}
+
+.accordion-expanded
+{
+    @apply font-sans bg-gray-100 hover:bg-gray-200 focus:bg-gray-400 rounded-md shadow-md p-2 transition-all duration-300 ease-in-out overflow-hidden max-h-full h-fit gap-2
+}
+
+.accordion-header
+{
+    @apply font-title text-base flex flex-row items-center pointer-events-none mb-2
+}
+
+.accordion-content-wrapper
+{
+    @apply w-full h-full flex flex-col gap-2
+}

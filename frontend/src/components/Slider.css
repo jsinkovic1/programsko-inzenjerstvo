@@ -1,0 +1,26 @@
+﻿@import "tailwindcss";
+
+.slider-container
+{
+    @apply flex flex-col justify-around h-10;
+}
+
+.slider
+{
+    -webkit-appearance: none;
+    appearance: none;
+    @apply rounded-full h-2 w-full bg-gray-300 z-1
+}
+
+.slider::-webkit-slider-runnable-track, .slider::-moz-range-progress
+{
+    -webkit-appearance: none;
+    appearance: none;
+    @apply rounded-full h-2 w-full bg-blue-900 z-2
+}
+
+.slider::-webkit-slider-thumb, .slider::-moz-range-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    @apply w-5 h-5 rounded-full z-10;
+}

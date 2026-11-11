@@ -1,1 +1,47 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Roboto:wght@500&display=swap");
 @import "tailwindcss";
+
+@theme {
+    --font-sans: "Inter", system-ui, sans-serif;
+    --font-title: "Roboto", sans-serif;
+}
+
+.button
+{
+    @apply font-sans text-base bg-gray-100 hover:bg-gray-200 focus:bg-gray-400 rounded-md shadow-md p-2
+}
+
+.fill-primary
+{
+    @apply bg-blue-900 hover:bg-blue-800 focus:bg-blue-950 text-white
+}
+
+.fill-accent
+{
+    @apply bg-amber-500 hover:bg-amber-400 focus:bg-amber-700
+}
+
+.text-input
+{
+    @apply font-sans text-base border-2 bg-gray-100 hover:bg-gray-200 focus:bg-gray-100 focus:outline-none border-transparent focus:border-amber-500 rounded-md shadow-md p-2
+}
+
+/*dodano da slike u "galeriji" imaju zaobljene rubove*/
+
+.image-gallery-content, .image-gallery-slide, .image-gallery-image {
+  border-radius: 0.5rem;
+  overflow: hidden
+}
+
+.image-gallery-thumbnail img {
+    border-radius: 0.5rem;
+    cursor: pointer
+}
+
+.image-gallery-thumbnail,
+.image-gallery-thumbnail.active,
+.image-gallery-thumbnail:focus {
+    border-radius: 0.5rem;
+    
+}
+
