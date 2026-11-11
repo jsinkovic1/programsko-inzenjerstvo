@@ -33,7 +33,7 @@ function Details()
                 <div className="flex flex-col justify-between flex-1 w-full gap-6 m-4 md:m-8">
                     <div>
                         <h1 className = "hover:text-blue-950 hover:cursor-pointer text-blue-900 font-title text-[clamp(16px,2vw,22px)] font-bold">
-                            <a href="/vessel/${boat.idplovila}">{boat["nazivplovila"]}</a>
+                            <a href={`/vessel/${boat.idplovila}`}>{boat["nazivplovila"]}</a>
                         </h1>
                         <div className="text-sm text-amber-500 mt-1 flex items-center gap-1">
                             {boat["model"]} - {boat["godinaproizvodnje"]} god.
