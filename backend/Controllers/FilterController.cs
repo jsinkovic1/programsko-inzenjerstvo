@@ -25,10 +25,6 @@ namespace CharterBackend.Controllers
         {
             var query = ctx.Plovila.Include(v => v.Luka).Include(v => v.Termini).AsQueryable();
 
-            /*if (!string.IsNullOrEmpty(filterDTO.VesselName)) query = query.Where(v => Fuzz.WeightedRatio(v.Nazivplovila, filterDTO.VesselName, FuzzySharp.PreProcess.PreprocessMode.Full) >= 70);
-            if (!string.IsNullOrEmpty(filterDTO.HarborName)) query = query.Where(v => Fuzz.WeightedRatio(v.Luka.Nazivluke, filterDTO.HarborName, FuzzySharp.PreProcess.PreprocessMode.Full) >= 70);
-            if (!string.IsNullOrEmpty(filterDTO.PlaceName)) query = query.Where(v => Fuzz.WeightedRatio(v.Luka.Mjesto, filterDTO.PlaceName, FuzzySharp.PreProcess.PreprocessMode.Full) >= 70);
-            if (!string.IsNullOrEmpty(filterDTO.model)) query = query.Where(v => v.Model == filterDTO.model);*/
             if (filterDTO.Capacity.HasValue) query = query.Where(v => v.Kapacitet >= filterDTO.Capacity);
             if (filterDTO.CabinNumber.HasValue) query = query.Where(v => v.Brojkabina >= filterDTO.CabinNumber);
             if (filterDTO.BedNumber.HasValue) query = query.Where(v => v.Brojlezajeva >= filterDTO.BedNumber);
