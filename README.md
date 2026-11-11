@@ -1,22 +1,26 @@
 # [Naziv aplikacije]
 
-Web-aplikacija za upravljanje poslovanjem charter tvrtke koja iznajmljuje plovila: klijenti pretražuju plovila prema terminu i karakteristikama, vide ukupnu cijenu najma i šalju zahtjev za rezervaciju, dok djelatnici tvrtke na jednom mjestu upravljaju flotom, rezervacijama i rasporedom preuzimanja i povrata.
+Web-aplikacija za podršku poslovanju charter tvrtke koja iznajmljuje plovila, od pretrage i rezervacije plovila do upravljanja flotom i praćenja poslovanja.
 
 **Projekt na kolegiju:** Ovu je aplikaciju razvio studentski tim u sklopu kolegija [Programsko inženjerstvo](https://www.fer.unizg.hr/predmet/proinz) na Fakultetu elektrotehnike i računarstva Sveučilišta u Zagrebu (FER).
 
-<!--
 ## Opis aplikacije
 
-[U dvije ili tri rečenice objasnite problem, ciljane korisnike i glavnu korist svoje aplikacije. Trenutačne funkcionalnosti navedite odvojeno od planiranih; opišite stvarni opseg umjesto obećanih mogućnosti.]
 
-**Ključne funkcionalnosti**
+Kada se ponuda, raspoloživost plovila i rezervacije vode u odvojenim evidencijama, teško je imati pregled poslovanja i lako dolazi do dvostrukog rezerviranja. Aplikacija klijentima omogućuje da pronađu slobodno plovilo za željeni termin, vide ukupnu cijenu najma i pošalju zahtjev za rezervaciju, a djelatnicima, voditelju i administratoru tvrtke daje jedno mjesto za upravljanje flotom, rezervacijama i rasporedom preuzimanja i povrata. Aplikacija je u razvoju, pa funkcionalnosti u nastavku čine planirani opseg.
 
-- [Reprezentativna funkcionalnost koju korisnici mogu isprobati]
-- [Druga reprezentativna funkcionalnost]
-- [Po želji dodatna funkcionalnost; nemojte kopirati cijeli popis zahtjeva]
+**Ključne funkcionalnosti (planirane)**
+
+- Pretraživanje plovila prema terminu, matičnoj luci, vrsti plovila i kapacitetu, uz prikaz cijene najma za odabrano razdoblje.
+- Detalji plovila s fotografijama, opremom, kalendarom raspoloživosti, položajem matične luke na karti i vremenskom prognozom.
+- Rezervacija plovila s dodatnim uslugama i opremom, uz izračun ukupnog iznosa, sprječavanje preklapanja termina i potvrdu e-poštom.
+- Upravljanje flotom, cijenama, uslugama, nedostupnošću plovila i rezervacijama te raspored preuzimanja i povrata za djelatnike.
+- Statistika poslovanja s izvozom izvještaja u CSV.
+- Prijava putem AAI@EduHr s ulogama klijenta, djelatnika, voditelja i administratora.
 
 Za potpuni opseg, zahtjeve, oblikovanje i dokaze ispitivanja pogledajte [docs](docs/Home.md).
 
+<!--
 <a id="deployment"></a>
 ## Postavljanje (engl. deployment)
 -->
@@ -63,16 +67,16 @@ cd [repository directory]
 
 ## Tehnologije
  
-| Tehnologija ili alat | Uloga u ovom projektu | Razlog uporabe ili važno ograničenje |
+| Tehnologija ili alat | Uloga u ovom projektu | Razlog uporabe |
 | --- | --- | --- |
-| React (Vite) | Prikazuje katalog plovila, pretragu, rezervacije te sučelja za djelatnike, voditelja i administratora u pregledniku. | Sučelje mora biti responzivno za računala, tablete i mobilne uređaje; Vite se koristi za razvojni poslužitelj i izradu produkcijske inačice. |
-| C# (ASP.NET) | Poslužiteljska strana: provodi poslovna pravila (statusi i prijelazi rezervacija, izračun iznosa), prijavu putem AAI@EduHr, slanje e-pošte i pozive vanjskih servisa. | Ovlasti se moraju provjeravati na poslužitelju, a ne samo skrivanjem elemenata u sučelju. |
-| PostgreSQL | Pohranjuje korisnike, plovila, rezervacije, opremu, usluge i termine zauzetosti. | Preklapanje termina istog plovila sprječava se ograničenjem u bazi (`EXCLUDE` uz proširenje `btree_gist`), pa vrijedi i pri istodobnim zahtjevima; potrebno je proširenje `btree_gist`. |
-| AAI@EduHr (OAuth 2.0) | Jedini način prijave korisnika. | Zahtjev kolegija: aplikacija ne pohranjuje lozinke, a uloge i specijalnosti djelatnika vodi sama. |
-| Gmail API | Šalje klijentu e-poštu s potvrdom rezervacije i obavijest o otkazivanju ili odbijanju. | Ovisi o vanjskoj usluzi; neuspjelo slanje ne poništava promjenu statusa rezervacije i evidentira se. |
-| [Kartografski servis] | Prikazuje položaj matične luke (mjesta preuzimanja) na karti. | Ovisi o vanjskoj usluzi; kada nije dostupna, prikazuje se obavijest, a ostale funkcionalnosti rade. |
-| [Meteorološki servis] | Dohvaća vremensku prognozu za matičnu luku i razdoblje najma. | Prognoza je dostupna samo za raspon koji servis nudi; izvan njega prikazuje se obavijest. |
-| [Platforma za smještaj, npr. Render] | Smješta aplikaciju na internet. | [Ograničenja besplatne kvote ili hladnog pokretanja, ako postoje.] |
+| React (Vite) | Korisničko sučelje: katalog, pretraga, rezervacije te sučelja za djelatnike, voditelja i administratora. | Komponente olakšavaju izradu responzivnog sučelja za računala, tablete i mobitele; Vite omogućuje brz razvoj i izradu produkcijske inačice. |
+| C# (ASP.NET Core) | Poslužiteljska strana: poslovna pravila, prijava, slanje e-pošte i pozivi vanjskih servisa. | Zreo okvir za izradu REST API-ja s ugrađenom podrškom za autentifikaciju i autorizaciju; uz Entity Framework Core olakšava rad s bazom. |
+| PostgreSQL | Pohranjuje korisnike, plovila, rezervacije, usluge i termine zauzetosti. | Pouzdana relacijska baza čije ograničenje `EXCLUDE` (proširenje `btree_gist`) sprječava preklapanje rezervacija i pri istodobnim zahtjevima. |
+| AAI@EduHr (OAuth 2.0) | Prijava korisnika. | Zahtjev kolegija: aplikacija ne pohranjuje lozinke, a uloge i specijalnosti djelatnika vodi sama. |
+| [Servis za e-poštu] | Šalje klijentu potvrdu rezervacije i obavijest o otkazivanju ili odbijanju. | [Razlog odabira servisa.] |
+| [Kartografski servis] | Prikazuje položaj matične luke na karti. | Zadatak traži prikaz lokacije luke; [razlog odabira servisa]. |
+| [Meteorološki servis] | Dohvaća vremensku prognozu za matičnu luku i razdoblje najma. | Zadatak traži prikaz prognoze; [razlog odabira servisa]. |
+| [Hosting servis] | Pokreće aplikaciju i bazu tako da su dostupne putem interneta. | [Razlog odabira platforme.] |
 
 <a id="team-members"></a>
 ## Članovi tima
@@ -88,8 +92,6 @@ cd [repository directory]
 | [Ivana Žukina](https://github.com/Ivana-Zukina) | Frontend |
 
 
-Uloge se tijekom projekta mogu mijenjati. Repozitorij i dogovoreni alat za praćenje zadataka (engl. task tracker) služe kao dodatni dokazi timskog rada.
-
 ## Doprinos projektu
 
 Cijeli tim sastaje se jednom tjedno radi dogovora o prioritetima i pregleda napretka, a članovi koji rade na srodnim funkcionalnostima češće se međusobno usklađuju. Zadaci i nedostaci vode se u [GitHub Issues](https://github.com/jsinkovic1/programsko-inzenjerstvo/issues).
@@ -99,7 +101,7 @@ Izravni `push` na granu `main` nije dopušten. Sve promjene izrađuju se na zase
 <a id="license"></a>
 ## Licenca
  
-**Status licence:** Projekt je licenciran licencom [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). Puni tekst nalazi se u datoteci [LICENCE.md](LICENCE.md).
+**Status licence:** Projekt je licenciran licencom [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). Puni tekst nalazi se u datoteci [LICENCE](LICENCE).
  
 
 <a id="ai-usage"></a>

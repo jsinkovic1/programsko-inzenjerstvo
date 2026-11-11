@@ -5,10 +5,9 @@ skinparam shadowing false
 skinparam defaultFontName "Segoe UI"
 skinparam defaultFontSize 13
 skinparam nodesep 28
-skinparam ranksep 120
+skinparam ranksep 100
 skinparam roundCorner 14
 
-' boje
 skinparam usecase {
     BackgroundColor #D8E8FF
     BorderColor #5070A0
@@ -31,26 +30,17 @@ skinparam rectangle {
 }
 hide stereotype
 
-' akteri
 actor "Posjetitelj" as posjetitelj
 actor "Klijent" as klijent
 actor "Djelatnik" as djelatnik
 actor "Voditelj" as voditelj
 actor "Administrator" as admin
-actor "Prijavljeni korisnik" as user
 
-user <|-- admin
-user <|-- voditelj
-user <|-- djelatnik
-user <|-- klijent
-
-' vanjski sustavi
 actor "Pružatelj identiteta\n(AAI@EduHr)" as aai <<external system>>
-actor "Servis za slanje\ne-pošte" as mail <<external system>>
-actor "Meteorološki\nservis" as meteo <<external system>>
 actor "Kartografski\nservis" as maps <<external system>>
+actor "Meteorološki\nservis" as meteo <<external system>>
+actor "Servis za slanje\ne-pošte" as mail <<external system>>
 
-' obrnuti redoslijed da UC-001 bude na vrhu
 rectangle "Sustav za charter poslovanje" {
     usecase "UC-011: Pregled statistike\ni izvoz izvještaja" as UC11
     usecase "UC-010: Upravljanje flotom,\ncjenicima i nedostupnošću" as UC10
@@ -65,7 +55,9 @@ rectangle "Sustav za charter poslovanje" {
     usecase "UC-001: Prijava u sustav\nputem AAI@EduHr" as UC1
 }
 
-' posjetitelj i klijent
+posjetitelj --> UC1
+UC1 --> aai
+
 posjetitelj --> UC2
 posjetitelj --> UC3
 
@@ -76,22 +68,20 @@ klijent --> UC5
 klijent --> UC6
 UC6 --> mail
 
-' prijava
-user --> UC1
-UC1 --> aai
-
-' karta i vrijeme
 UC3 --> maps
 UC3 --> meteo
 
-' djelatnik
+djelatnik --> UC3
 djelatnik --> UC7
 
-' administrator i voditelj
 admin --> UC8
 admin --> UC9
+admin --> UC3
 UC9 --> mail
 admin --> UC10
 admin --> UC11
+
 voditelj --> UC11
+voditelj --> UC3
+
 @enduml

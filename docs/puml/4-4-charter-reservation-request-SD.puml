@@ -62,7 +62,7 @@ else klijent je autoriziran
   else unos je ispravan
     Service -> Kalk ++ : Izracunaj(...)
     Kalk --> Service -- : iznos
-    Service -> DB ++ : BEGIN; INSERT TERMIN; INSERT REZERVACIJA (ZAHTJEV, iznos);\nINSERT stavke; COMMIT
+    Service -> DB ++ : BEGIN; INSERT TERMIN (ZAHTJEV); INSERT REZERVACIJA (iznos);\nINSERT stavke; COMMIT
 
     alt termin se preklapa (istodobni zahtjev ili rezervacija u međuvremenu)
       DB --> Service : ograničenje odbija preklapajući termin, ROLLBACK
