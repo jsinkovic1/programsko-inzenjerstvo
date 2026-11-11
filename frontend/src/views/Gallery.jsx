@@ -4,10 +4,16 @@ import Accordion from "../components/Accordion.jsx";
 import Slider from "../components/Slider.jsx";
 import RangeSlider from "../components/RangeSlider.jsx";
 import {CardMedium, CardSmall} from "../components/Cards.jsx";
+import {useState} from "react";
+import Vessel from "../models/Vessel.js";
 
 
 function Gallery() {
     var nav = useNavigate()
+    const [vessel, SetVessel] = useState(null)
+
+
+    Vessel.GetById(1).then(x => SetVessel(x))
     return (
         <div className={"grid grid-cols-5 p-10 gap-2"}>
             <div className={"flex flex-col gap-2"}>
@@ -33,7 +39,7 @@ function Gallery() {
                 <RangeSlider min={0} max={100} step={1}/>
             </div>
             <div className={"flex flex-col gap-2"}>
-                <CardSmall/>
+                <CardSmall vessel={vessel}/>
                 <CardMedium/>
             </div>
         </div>
