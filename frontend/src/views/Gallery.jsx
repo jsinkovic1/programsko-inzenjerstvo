@@ -3,6 +3,8 @@ import {useNavigate} from "react-router-dom";
 import Accordion from "../components/Accordion.jsx";
 import Slider from "../components/Slider.jsx";
 import RangeSlider from "../components/RangeSlider.jsx";
+import {CardMedium, CardSmall} from "../components/Cards.jsx";
+
 
 function Gallery() {
     var nav = useNavigate()
@@ -30,7 +32,10 @@ function Gallery() {
                 <Slider min={0} max={100} step={1}/>
                 <RangeSlider min={0} max={100} step={1}/>
             </div>
-
+            <div className={"flex flex-col gap-2"}>
+                <CardSmall/>
+                <CardMedium/>
+            </div>
         </div>
     )
 }
