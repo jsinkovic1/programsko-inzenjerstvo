@@ -25,17 +25,17 @@ function Details()
 
     try {
         var cards = boatDisplay.map(boat =>
-            <div key={boat.idplovila} className = "flex flex-col md:flex-row items-center md:items-start justify-between rounded-md border-yellow-500 border-2 p-4 m-2 w-3/4 mx-auto gap-4">
+            <div key={boat.idplovila} className = "flex flex-col md:flex-row items-center md:items-start justify-between rounded-md shadow-md p-4 m-2 w-3/4 mx-auto gap-4">
                 {/*prvi stupac */}
                 <img src={placeholder} alt="boat" className="w-4/5 md:w-1/5 rounded-md object-contain" />
                 
                 {/*drugi stupac */}
                 <div className="flex flex-col justify-between flex-1 w-full gap-6 m-4 md:m-8">
                     <div>
-                        <h1 className = "hover:underline text-navy font-title text-[clamp(16px,2vw,22px)] font-bold">
-                            {boat["nazivplovila"]}
+                        <h1 className = "hover:text-blue-950 hover:cursor-pointer text-blue-900 font-title text-[clamp(16px,2vw,22px)] font-bold">
+                            <a href="/vessel/${boat.idplovila}">{boat["nazivplovila"]}</a>
                         </h1>
-                        <div className="text-sm text-yellow-500 mt-1 flex items-center gap-1">
+                        <div className="text-sm text-amber-500 mt-1 flex items-center gap-1">
                             {boat["model"]} - {boat["godinaproizvodnje"]} god.
                         </div>
                     </div>
@@ -55,7 +55,7 @@ function Details()
                         <h1 className = "text-navy font-title text-base">
                             (ime luke)
                         </h1>
-                        <div className="text-lg text-yellow-500 font-bold my-1 gap-1">
+                        <div className="text-lg text-amber-500 font-bold my-1 gap-1">
                             {boat["dnevnacijenanajma"] * dani} €
                         </div>
                     </div>
