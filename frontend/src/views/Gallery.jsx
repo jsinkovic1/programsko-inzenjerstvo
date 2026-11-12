@@ -4,8 +4,9 @@ import Accordion from "../components/Accordion.jsx";
 import Slider from "../components/Slider.jsx";
 import RangeSlider from "../components/RangeSlider.jsx";
 import {CardMedium, CardSmall} from "../components/Cards.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Vessel from "../models/Vessel.js";
+import {MdInsertEmoticon} from "react-icons/md";
 
 
 function Gallery() {
@@ -13,7 +14,8 @@ function Gallery() {
     const [vessel, SetVessel] = useState(null)
 
 
-    Vessel.GetById(1).then(x => SetVessel(x))
+    useEffect(() => {Vessel.GetById(1).then(x => SetVessel(x))}, [])
+
     return (
         <div className={"grid grid-cols-5 p-10 gap-2"}>
             <div className={"flex flex-col gap-2"}>
@@ -37,6 +39,30 @@ function Gallery() {
                 <input type="text" placeholder={"Text input"} className="text-input"/>
                 <Slider min={0} max={100} step={1}/>
                 <RangeSlider min={0} max={100} step={1}/>
+                <div className={"flex flex-row gap-2 h-10"}>
+                    <button onClick={() => nav("/map")} className={"icon-button w-10"}>
+                        <MdInsertEmoticon id={"icon"} />
+                    </button>
+                    <button className={"icon-button fill-primary dropdown"}>
+                        <MdInsertEmoticon id={"icon"} />
+                        <div className={"dropdown-content"}>
+                            <a href={"/details  "}>
+                                Option 1
+                            </a>
+                            <a href={"/"}>
+                                Option 2
+                            </a>
+                            <a href={"/map"}>
+                                Option 3
+                            </a>
+                        </div>
+
+                    </button>
+                    <button onClick={() => nav("/map")} className={"icon-button fill-accent"}>
+                        <MdInsertEmoticon id={"icon"} />
+                    </button>
+                </div>
+
             </div>
             <div className={"flex flex-col gap-2"}>
                 <CardSmall vessel={vessel}/>

@@ -4,6 +4,7 @@
 {
     display: grid;
     grid-template-rows: 0 0 0;
+    @apply mt-2 mb-4
 }
 
 .range-slider
