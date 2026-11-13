@@ -1,5 +1,5 @@
 ﻿import {Component} from "react";
-import userIcon from "../assets/user.svg";
+import {FaUserCircle} from "react-icons/fa";
 
 function Logo() {
   return (
@@ -18,7 +18,7 @@ function Logo() {
 class Header extends Component {
     render() {
         return ( 
-      <header className="relative flex h-[67px] items-center justify-between bg-linear-to-r from-blue-950 to-blue-500 px-2.5 shadow-[0_2px_4px_rgba(0,0,0,0.25)]">
+      <header className="relative flex h-16 items-center justify-between bg-linear-to-r from-blue-950 to-blue-500 px-2.5 shadow-md">
         <a href="/" className="flex" aria-label="Charter home">
           <Logo />
         </a>
@@ -27,11 +27,16 @@ class Header extends Component {
           Charter
         </h1>
 
-        <button
-          aria-label="Korisnički profil"
-          className="grid size-[47px] cursor-pointer place-items-center rounded-xl border-2 border-aqua bg-transparent p-0 hover:bg-white/10 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-aqua"
-        >
-          <img src={userIcon} alt="" className="block size-[48px]" />
+        <button className={"button icon-button fill-primary dropdown h-10"}>
+            <FaUserCircle></FaUserCircle>
+            <div className={"dropdown-content right-0"}>
+                <a href={"/login"}>
+                    Prijava
+                </a>
+                <a href={"/signup"}>
+                    Registracija
+                </a>
+            </div>
         </button>
       </header>
         )

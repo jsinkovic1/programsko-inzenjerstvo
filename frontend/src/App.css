@@ -8,17 +8,17 @@
 
 .button
 {
-    @apply font-sans text-base align-middle bg-gray-100 hover:bg-gray-200 focus:bg-gray-400 rounded-md shadow-md p-2
+    @apply font-sans text-base align-middle bg-gray-100 hover:bg-gray-200 focus:bg-gray-400 rounded-md shadow-md p-2 cursor-pointer
 }
 
 
 .icon-button
 {
-    @apply flex flex-row items-center justify-center aspect-square font-sans text-base bg-gray-100 hover:bg-gray-200 focus:bg-gray-400 rounded-full shadow-md p-2
+    @apply flex flex-row items-center justify-center aspect-square font-sans text-base bg-gray-100 hover:bg-gray-200 focus:bg-gray-400 rounded-full shadow-md p-2 cursor-pointer
 
 }
 
-.icon-button > #icon
+.icon-button > svg
 {
     @apply w-full h-full
 }
