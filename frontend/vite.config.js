@@ -15,7 +15,11 @@ export default defineConfig({
                             target: 'http://16.192.213.81:5201',
                             changeOrigin: true,
                         }
-                }
+                },
+            allowedHosts:
+            [
+                "charterly.site"
+            ]
         }
 
 })
