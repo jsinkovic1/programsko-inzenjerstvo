@@ -10,7 +10,7 @@ import {MdInsertEmoticon} from "react-icons/md";
 
 
 function Gallery() {
-    var nav = useNavigate()
+    const nav = useNavigate();
     const [vessel, SetVessel] = useState(null)
 
 
@@ -49,7 +49,7 @@ function Gallery() {
 
                 {/* Slideri */}
                 <Slider min={0} max={100} step={1}/>
-                <RangeSlider min={0} max={100} step={1}/>
+                <RangeSlider min={0} max={10} step={1}/>
 
                 {/* Gumbi s ikonom */}
                 <div className={"flex flex-row gap-2 h-10"}>
@@ -81,6 +81,7 @@ function Gallery() {
             </div>
             <div className={"flex flex-col gap-2"}>
                 <CardSmall vessel={vessel}/>
+                <CardSmall vessel={vessel} viewButton={true}/>
                 <CardMedium/>
             </div>
         </div>
