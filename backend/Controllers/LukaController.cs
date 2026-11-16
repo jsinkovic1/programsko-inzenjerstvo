@@ -1,6 +1,7 @@
 ﻿using CharterBackend.Data;
 using CharterBackend.Dtos;
 using CharterBackend.Mappers;
+using CharterBackend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
@@ -60,6 +61,25 @@ namespace CharterBackend.Controllers
 
             return Ok(harbor);
         }
+        [HttpGet("{id:int}/plovila")]
+        public async Task<IActionResult> GetVesselsInHarbor(int id)
+        {
+            Luka? harbor;
+            try
+            {
+                harbor = await ctx.Luke.Include(h => h.Plovila).Where(h => h.Idluke == id).FirstOrDefaultAsync();
+            }
+            catch (DbException)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Došlo je do greške prilikom dohvaćanja podataka");
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Došlo je do neočekivane greške na serveru");
+            }
+            var vessels = harbor!.Plovila.Select(v => v.ToPloviloDTO());
 
+            return Ok(vessels);
+        }
     }
 }

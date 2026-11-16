@@ -8,6 +8,8 @@
 | --- | --- | --- | --- |
 | 15. 10. 2026.; Svi | Podjela uloga, odabir tehnologija, početni zadatci | TT, FR i IT rade model baze podataka. IŽ, BL, JG rade početni dizajn glavne stranice, IT, TT i JS rade početnu dokumentaciju (funkcijske i nefunkcijske zahtjeve) | Zadaci #1 i #2. |
 | 22. 10. 2026.; svi osim TT | Početni deployment, dorada baze, inicijalni frontend i backend | JG radi početni deployment, FR i IT dorađuju bazu, FR i IT rade početni backend, TT i JS dorađuju dokumentaciju, IŽ, BL i JG rade početni frontend | Zadaci #3, #4, #8. |
+| 29. 10. 2026.; Svi | Dovršetak inicijalnog frontenda, dokumentacija arhitekture, postavljanje na server, početne rute backenda | IŽ, BL i JG dovršavaju inicijalni frontend, JS i TT rade dokumentaciju arhitekture, JG postavlja bazu, backend i frontend na server, FR i IT rade početne rute backenda | Zadatak #15 |
+| 7. 11. 2026.; Svi | Promjene baze, OAuth prijava, filtriranje i pretraga na frontendu | IT, FR i JS rade promjene na bazi, TT dodaje dodatne podatke u bazu, FR počinje implementaciju prijave putem OAuth 2.0, IŽ, BL i JG implementiraju filter i fuzzy pretragu na frontendu. | Zadaci #13, #21, #22, #23 |
 
 
 ## A.2 Plan rada
@@ -16,6 +18,8 @@
 | --- | --- | --- | --- |
 | Projektni tjedan 2 | Podjela uloga i odabir tehnologija. Izrada modela baze podataka. Početni dizajn glavne stranice. Početna dokumentacija (funkcijski i nefunkcijski zahtjevi). | Svi (podjela uloga, odabir tehnologija). TT, FR, IT (model baze). IŽ, BL, JG (dizajn glavne stranice). IT, TT, JS (dokumentacija). | Zadaci #1 i #2. |
 | Projektni tjedan 3 | Početni deployment. Dorada baze podataka. Inicijalni backend. Dorada dokumentacije. Inicijalni frontend. | JG (deployment). FR, IT (baza i backend). TT, JS (dokumentacija). IŽ, BL, JG (frontend). | Zadaci #3, #4 i #8. |
+| Projektni tjedni 4 i 5 | Dovršetak inicijalnog frontenda. Dokumentacija obrazaca i arhitekture. Postavljanje baze, backenda i frontenda na server. Početne rute backenda. | IŽ, BL, JG (frontend). JS, TT (dokumentacija). JG (postavljanje na server). FR, IT (backend). | Zadatak #15 |
+| Projektni tjedni 6 | Promjene na bazi i dodatni podaci u bazi. Početak implementacije prijave putem OAuth 2.0. Filter i fuzzy pretraga na frontendu. | FR, IT, TT (baza). FR (prijava). IŽ, BL, JG (frontend). JS i TT (dokumentacija). | Zadaci #13, #21, #22, #23 |
 
 
 <!--

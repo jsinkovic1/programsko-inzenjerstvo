@@ -7,6 +7,8 @@ public class Imadodatneusluge
 
 	public int idtermina { get; set; }
 
+	public decimal cijenadodatneusluge { get; set; }
+
 	public Usluga Usluga { get; set; } = null!;
 
 	public Rezervacija Rezervacija { get; set; } = null!;

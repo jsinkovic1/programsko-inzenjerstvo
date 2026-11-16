@@ -13,13 +13,7 @@ public partial class Rezervacija
 
     public int Brojosoba { get; set; }
 
-    public string Status { get; set; } = null!;
-
     public DateOnly Datumkreiranja { get; set; }
-
-    public int Idluke { get; set; }
-
-    public virtual Luka Luka { get; set; } = null!;
 
     public virtual Termin Termin { get; set; } = null!;
 
