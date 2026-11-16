@@ -6,6 +6,8 @@ import "./Map.css"
 import {DivIcon} from "leaflet/src/layer/index.js";
 import placeholder from "../assets/placeholder.svg"
 import Accordion from "../components/Accordion.jsx";
+import {CardSmall} from "../components/Cards.jsx";
+import Vessel from "../models/Vessel.js";
 
 
 function VesselCard(vessel)
@@ -50,7 +52,8 @@ function HarborMarker({ position, name }) {
                 }
             })
             const json = await response.json()
-            SetVesselCards(json.map(x => VesselCard(x)))
+            console.log(json)
+            SetVesselCards(json.map(x => (<CardSmall vessel={new Vessel(x)}/>)))
         }
     }), [name])
 
@@ -61,7 +64,7 @@ function HarborMarker({ position, name }) {
                 <div className={"absolute -top-8 w-auto h-16 -z-1 bg-white rounded-xl text-2xl pl-1 pr-1"}>
                     {name}
                 </div>
-                <ul className={"w-full h-full flex-col overflow-y-scroll rounded-xl"}>
+                <ul className={"flex flex-col overflow-y-scroll rounded-xl"}>
                     {vesselCards}
                 </ul>
 

@@ -5,6 +5,7 @@ import Details from "./views/Details.jsx";
 import Map from "./views/Map.jsx"
 import Vessel from "./views/Vessel.jsx"
 import Gallery from "./views/Gallery.jsx";
+import Login from "./views/Login.jsx";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
                 <Route path="/details" element={<Details />} />
                 <Route path="/vessel/:id" element={<Vessel />} />
                 <Route path="/dev/gallery" element={<Gallery />} />
+                <Route path="/login" element={<Login />} />
             </Routes>
         </BrowserRouter>
     );
