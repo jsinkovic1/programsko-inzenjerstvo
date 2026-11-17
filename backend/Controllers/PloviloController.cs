@@ -1,7 +1,6 @@
 ﻿using CharterBackend.Data;
 using CharterBackend.Dtos;
 using CharterBackend.Mappers;
-using CharterBackend.Utilities;
 using FuzzySharp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
@@ -16,7 +15,6 @@ namespace CharterBackend.Controllers
 	public class PloviloController : ControllerBase
 	{
 		private readonly AppDbContext ctx;
-		private readonly SearchUtility searchUtility = new SearchUtility();
 
 		public PloviloController(AppDbContext ctx)
 		{
