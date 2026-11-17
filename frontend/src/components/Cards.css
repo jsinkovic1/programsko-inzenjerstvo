@@ -1,0 +1,52 @@
+﻿@import "tailwindcss";
+@import "../App.css";
+
+.card-small
+{
+    @apply h-30 rounded-md bg-gray-100 flex flex-row;
+
+    .card-image
+    {
+        @apply aspect-square h-full
+    }
+
+    .card-content-wrapper
+    {
+        @apply w-full h-full p-1 flex flex-col
+    }
+
+    .card-header
+    {
+        @apply font-title text-lg pl-1 border-b-1 border-b-gray-200 text-gray-900
+    }
+
+    .card-description
+    {
+        @apply font-sans text-base text-gray-700 font-bold grid grid-cols-2 grid-rows-3 grid-flow-col h-full pl-1
+    }
+}
+
+.card-medium
+{
+    @apply h-full rounded-md bg-gray-100 overflow-hidden flex flex-col;
+
+    .card-image
+    {
+        @apply aspect-square
+    }
+
+    .card-content-wrapper
+    {
+        @apply w-full h-full p-1 flex flex-col
+    }
+
+    .card-header
+    {
+        @apply font-title text-lg pl-1 border-b-1 border-b-gray-200 text-gray-900
+    }
+
+    .card-description
+    {
+        @apply font-sans text-base text-gray-700 font-bold grid grid-cols-2 grid-rows-3 grid-flow-col h-full pl-1
+    }
+}

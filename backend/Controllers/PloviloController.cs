@@ -1,7 +1,7 @@
 ﻿using CharterBackend.Data;
 using CharterBackend.Dtos;
 using CharterBackend.Mappers;
-using CharterBackend.Utilities;
+using FuzzySharp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +15,6 @@ namespace CharterBackend.Controllers
 	public class PloviloController : ControllerBase
 	{
 		private readonly AppDbContext ctx;
-		private readonly SearchUtility searchUtility = new SearchUtility();
 
 		public PloviloController(AppDbContext ctx)
 		{
@@ -74,7 +73,7 @@ namespace CharterBackend.Controllers
 								   Select(p => p.ToPloviloDTO()).
 								   ToListAsync();
 
-			var result = vessels.Where(v => searchUtility.LevenshteinDistance(v.Nazivplovila, name) <= 2);
+			var result = vessels.Where(v => Fuzz.WeightedRatio(v.Nazivplovila, name, FuzzySharp.PreProcess.PreprocessMode.Full) >= 70);
 			return Ok(result);
 		}
 	}

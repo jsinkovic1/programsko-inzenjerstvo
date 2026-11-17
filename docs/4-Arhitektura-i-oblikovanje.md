@@ -61,16 +61,17 @@
 **Slika 4.2. ER dijagram sustava za charter poslovanje**
 
 **PlantUML izvor:** [izvor](./puml/4-2-charter-data-ERD.puml)  
-**Implementacija:** [`db/charter-database-setup.sql`](../db/charter-database-setup.sql)
+**Implementacija:** [`db/1-charter-database-setup.sql`](../db/1-charter-database-setup.sql)
 
-**Primjer:** Klijentica Ana rezervira jedrilicu od 1. 7. u 10:00 do 4. 7. u 11:00 uz uslugu skipera i dvije SUP daske. Nastaje termin s plovilom i razdobljem te rezervacija s iznosom, brojem osoba i statusom „zahtjev”. Odabrane usluge i oprema vežu se uz rezervaciju. Ako administrator za isto plovilo pokuša unijeti servis od 3. do 5. 7., baza odbija unos jer se termini preklapaju.
+**Primjer:** Klijentica Ana rezervira jedrilicu od 1. 7. u 10:00 do 4. 7. u 11:00 uz uslugu skipera i dvije SUP daske. Nastaje termin s plovilom, razdobljem i statusom „zahtjev” te rezervacija s iznosom i brojem osoba. Odabrane usluge i oprema vežu se uz rezervaciju zajedno s cijenom u trenutku izrade, a oprema i s količinom. Ako administrator za isto plovilo pokuša unijeti servis od 3. do 5. 7., baza odbija unos jer se termini preklapaju.
 
 **Analiza modela:**
 
-- **Termin** je zapis o tome da je plovilo zauzeto od jednog do drugog trenutka. Svaka rezervacija i svako razdoblje nedostupnosti ima svoj termin, a njihovi posebni podaci (iznos, status, razlog nedostupnosti) nalaze se u zasebnim tablicama. Baza ne dopušta da se dva termina istog plovila preklapaju. Razdoblje je oblika [preuzimanje, povrat), pa nova rezervacija smije početi točno u trenutku povrata prethodne.
+- **Termin** je zapis o tome da je plovilo zauzeto od jednog do drugog trenutka. Svaka rezervacija i svako razdoblje nedostupnosti ima svoj termin sa statusom (statusi rezervacije ili „nedostupan termin”), a njihovi posebni podaci (iznos, razlog nedostupnosti) nalaze se u zasebnim tablicama. Baza ne dopušta da se dva termina istog plovila preklapaju; otkazani termini se pri tome ne uzimaju u obzir, pa otkazivanje odmah oslobađa plovilo. Razdoblje je oblika [preuzimanje, povrat), pa nova rezervacija smije početi točno u trenutku povrata prethodne.
 - **Luke, vrste plovila i proizvođači** vode se kao zasebni popisi u vlastitim tablicama, a plovilo na njih samo upućuje. Tako se svaki naziv upisuje samo jednom, a plovila se lako filtriraju po luci, vrsti ili proizvođaču. Luka uz naziv sadrži i koordinate potrebne za kartu i vremensku prognozu.
-- **Korisnik** čuva samo podatke iz AAI@EduHr, ulogu i oznaku aktivnosti; lozinke se ne pohranjuju.
-- **Stavke rezervacije** (usluge i dodatna oprema) povezuju rezervaciju s katalogom.
+- **Korisnik** čuva samo podatke iz AAI@EduHr, ulogu i oznaku aktivnosti; lozinke se ne pohranjuju. Specijalnost djelatnika zapisuje se kao njegova uloga (skiper, mehaničar, kuhar, čistač), pa djelatnik uvijek ima točno jednu specijalnost.
+- **Stavke rezervacije** (usluge i dodatna oprema) povezuju rezervaciju s katalogom i pamte cijenu u trenutku izrade, pa promjena cjenika ne mijenja postojeće rezervacije. Uz dodatnu opremu pamti se i količina.
+- **Pravila u bazi:** uz zabranu preklapanja, baza ne dopušta da se na istu rezervaciju veže više od jednog klijenta (djelatnika može biti više) te provjerava da status termina odgovara njegovoj vrsti: samo razdoblje nedostupnosti ima status „nedostupan termin”.
 
 ### 4.3.2 Reprezentativni UML dijagram razreda
 
@@ -164,7 +165,7 @@
 | Kontekst i cilj | Plovilo je zauzeto kada je rezervirano, ali i kada je na servisu ili održavanju. Ni ta se razdoblja ne smiju preklapati s rezervacijama (F-018). |
 | Kriteriji odluke | Jedno mjesto provjere preklapanja; jednostavan prikaz kalendara zauzetosti. |
 | Razmatrane alternative | **Odvojene tablice za rezervacije i nedostupnosti:** baza bi sprječavala preklapanje samo unutar svake tablice, a sukob rezervacije i servisa morala bi provjeravati aplikacija. **Zajednička tablica termina:** svako zauzeće plovila, bilo rezervacija ili nedostupnost, upisuje se kao termin (plovilo, početak, kraj), a dodatni podaci u svoju tablicu. |
-| Odluka i obrazloženje | Svako zauzeće plovila upisuje se kao termin. Rezervacija uz termin ima iznos, status i stavke, a nedostupnost razlog. Zabrana preklapanja definirana je samo nad terminima, pa automatski vrijedi i između rezervacija i servisa, a kalendar zauzetosti čita jednu tablicu. Nedostatak je što se rezervacija sprema kao dva povezana zapisa koji se moraju upisati zajedno. |
+| Odluka i obrazloženje | Svako zauzeće plovila upisuje se kao termin. Termin nosi status, rezervacija uz njega ima iznos i stavke, a nedostupnost razlog. Zabrana preklapanja definirana je samo nad terminima, pa automatski vrijedi i između rezervacija i servisa, a kalendar zauzetosti čita jednu tablicu. Nedostatak je što se rezervacija sprema kao dva povezana zapisa koji se moraju upisati zajedno. |
 | Status | Prihvaćeno. |
 
 ### ADR-04: Prijava putem AAI@EduHr i uloge u aplikaciji
