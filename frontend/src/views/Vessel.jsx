@@ -5,6 +5,7 @@ import placeholder from "../assets/placeholder.svg";
 import Header from "../components/Header.jsx";
 import ImageGallery from 'react-image-gallery';
 import 'react-image-gallery/styles/image-gallery.css';
+import {FaMoneyBill, FaBed, FaClock, FaDoorClosed, FaPeopleGroup, FaShip} from "react-icons/fa6";
 
 import 'leaflet/dist/leaflet.css';
 import "./Map.css"
@@ -81,14 +82,25 @@ function Vessel() {
                         <div>
                             <br/>
                             <br/>
-                            Cijena najma po danu: {boat.dnevnacijenanajma}€ <br/>
-                            Model: <br/>
-                            Kapacitet: {boat.kapacitet} <br/>
-                            Broj kabina: {boat.brojkabina} <br/>
-                            Broj ležajeva: {boat.brojlezajeva} <br/><br/>
+                            <div className={"flex flex-row items-center"}>
+                                <FaMoneyBill className={"text-2xl"}/>
+                                <span className={"text-lg pl-2"}> Cijena najma po danu: {boat.dnevnacijenanajma}€</span>
+                            </div>
+                            <div className={"flex flex-row items-center"}>
+                                <FaPeopleGroup className={"text-2xl"}/>
+                                <span className={"text-lg pl-2"}>Kapacitet: {boat.kapacitet} </span>
+                            </div>
+                            <div className={"flex flex-row items-center"}>
+                                <FaBed className={"text-2xl"}/>
+                                <span className={"text-lg pl-2"}> Broj ležajeva: {boat.brojlezajeva} </span>
+                            </div>
+                            <div className={"flex flex-row items-center"}>
+                                <FaDoorClosed className={"text-2xl"}/>
+                                <span className={"text-lg pl-2"}> Broj kabina: {boat.brojkabina} </span>
+                            </div>
                         </div>
                     </div>
-                    <button className = "bg-mainOrange hover:bg-amber-400 hover:cursor-pointer text-white font-semibold rounded-md px-4 py-2 w-full md:w-auto mt-2">
+                    <button className = "fill-accent hover:bg-amber-400 hover:cursor-pointer text-white font-semibold rounded-md px-4 py-2 w-full md:w-auto mt-2">
                         Rezerviraj
                     </button>
                 </div>
@@ -103,7 +115,7 @@ function Vessel() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1000]">
                     <button 
                     onClick={() => navigate('/map')}
-                    className="bg-navy hover:bg-blue-900 text-white font-bold px-4 py-2 rounded-lg">
+                    className="fill-primary font-bold px-4 py-2 rounded-lg">
                         Prikaži na karti
                     </button>
                 </div>
