@@ -47,7 +47,10 @@ builder.Services.AddCors(options =>
 // Proslijeđena zaglavlja omogućuju ispravno prepoznavanje izvornog protokola i IP adrese iza proxyja
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto |
+        ForwardedHeaders.XForwardedHost;
 });
 
 // Registriraju se pomoć za HTTP kontekst i aplikacijski servisi s dosegom jednog zahtjeva
@@ -112,6 +115,8 @@ builder.Services.AddAuthentication(opt =>
 });
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 if (app.Environment.IsDevelopment())
 {
