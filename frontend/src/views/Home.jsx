@@ -1,6 +1,7 @@
 ﻿import "../App.css";
 import Header from "../components/Header.jsx";
 import { useNavigate } from 'react-router-dom';
+import Footer from "../components/Footer.jsx";
 export default function Home() {
   const boatCount = 999;
   const navigate=useNavigate();
@@ -35,6 +36,7 @@ export default function Home() {
           ))}
         </section>
       </main>
+          <Footer/>
     </div>
   );
 }
