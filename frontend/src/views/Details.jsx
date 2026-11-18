@@ -4,6 +4,8 @@ import {useEffect, useState} from "react";
 import placeholder from "../assets/placeholder.svg";
 import { useNavigate } from 'react-router-dom';
 import Search from "./Search"
+import Accordion from "../components/Accordion.jsx";
+import RangeSlider from "../components/RangeSlider.jsx";
 
 function Details()
 {
@@ -75,8 +77,22 @@ function Details()
     return (<>
     <Header/>
         <div className = "flex flex-col items-center gap-4 min-h-screen bg-white font-sans text-black">
-            <div className="w-3/4 mt-4">
+            <div className="w-3/4 mt-4 flex flex-row gap-4">
                 <Search search = {search} setSearch = {setSearch}/>
+                <div className="relative">
+                    
+                </div>
+                <Accordion header={"Cijena"}>
+                    <RangeSlider min={0} max={10} step={1}/>
+                    <div className = "flex flex-row justify-evenly">
+                        <button className="button fill-primary">
+                            Odaberi
+                        </button>
+                        <button className="button">
+                            Odustani
+                        </button>
+                    </div>
+                </Accordion>
             </div>
             {cards}
         </div>

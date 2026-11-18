@@ -5,7 +5,7 @@ import placeholder from "../assets/placeholder.svg";
 import Header from "../components/Header.jsx";
 import ImageGallery from 'react-image-gallery';
 import 'react-image-gallery/styles/image-gallery.css';
-import {FaMoneyBill, FaBed, FaClock, FaDoorClosed, FaPeopleGroup, FaShip} from "react-icons/fa6";
+import {FaMoneyBill, FaBed, FaDoorClosed, FaPeopleGroup} from "react-icons/fa6";
 
 import 'leaflet/dist/leaflet.css';
 import "./Map.css"
