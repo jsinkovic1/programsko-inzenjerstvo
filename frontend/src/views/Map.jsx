@@ -31,23 +31,23 @@ function VesselCard(vessel)
 
         </li>)
 }
-function HarborMarker({ position, name }) {
+function HarborMarker({ position, name, id }) {
     const [vesselCards, SetVesselCards] = useState("")
 
     useEffect(() => {
        fetch("/api/filter", {
             method: "POST",
-            body: JSON.stringify({ harborName: name }),
+            body: JSON.stringify({ harborIds: [id] }),
             headers: {
                 "Content-type": "application/json; charset=UTF-8"
             }
         }).then(x => x.json()).then(json => SetVesselCards(json.map(x => VesselCard(x))))
-    }, [name]);
+    }, [id]);
     const eventHandlers = useMemo(() => ({
         async popupopen() {
             const response = await fetch("/api/filter", {
                 method: "POST",
-                body: JSON.stringify({ harborName: name }),
+                body: JSON.stringify({ harborIds: [id] }),
                 headers: {
                     "Content-type": "application/json; charset=UTF-8"
                 }
@@ -56,7 +56,7 @@ function HarborMarker({ position, name }) {
             console.log(json)
             SetVesselCards(json.map(x => (<CardSmall vessel={new Vessel(x)} viewButton={true}/>)))
         }
-    }), [name])
+    }), [id])
 
     const divIcon = new DivIcon({className: "marker", html: vesselCards.length})
     return (
@@ -83,7 +83,7 @@ function Map() {
     }, [])
 
     try {
-        var markers = pins.map(pin => <HarborMarker position={[parseFloat(pin["latituda"]), parseFloat(pin["longituda"])]} name={pin["nazivluke"]}/>)
+        var markers = pins.map(pin => <HarborMarker position={[parseFloat(pin["latituda"]), parseFloat(pin["longituda"])]} name={pin["nazivluke"]} id={pin["idluke"]}/>)
     } catch {
         markers = ""
     }
