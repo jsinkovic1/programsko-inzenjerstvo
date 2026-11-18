@@ -2,14 +2,14 @@ CREATE EXTENSION IF NOT EXISTS btree_gist;
 CREATE TABLE KORISNIK
 (
   idKorisnika INT GENERATED ALWAYS AS IDENTITY,
-  username VARCHAR(50) NOT NULL,
+  googlesubject VARCHAR(255) NOT NULL,
   ime VARCHAR(50) NOT NULL,
   prezime VARCHAR(50) NOT NULL,
   mail VARCHAR(100) NOT NULL,
   aktivan BOOLEAN NOT NULL,
   uloga VARCHAR(20) NOT NULL,
   PRIMARY KEY (idKorisnika),
-  UNIQUE (username),
+  UNIQUE (googlesubject),
   UNIQUE (mail)
 );
 
