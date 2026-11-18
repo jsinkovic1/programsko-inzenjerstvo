@@ -19,7 +19,7 @@ export default defineConfig({
                 {
                     '/api':
                         {
-                            target: 'http://16.192.213.81:5201',
+                            target: 'https://charterly.site:5201',
                             changeOrigin: true,
                         }
                 },
