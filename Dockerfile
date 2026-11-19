@@ -6,6 +6,8 @@ RUN mkdir /root/.aspnet
 RUN mkdir /root/.aspnet/https
 RUN dotnet build /root/backend/CharterBackend.csproj
 RUN dotnet dev-certs https -ep /root/.aspnet/https/aspnetapp.pfx -p temptemptemp
+RUN ls
+RUN env
 RUN dotnet dev-certs https --trust
 RUN apt-get -y update \
     && apt-get install -y curl \
