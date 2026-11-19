@@ -83,13 +83,23 @@ function Details()
                     
                 </div>
                 <Accordion header={"Cijena"}>
+                    <div className = "flex flex-row">
+                        <div className = "flex flex-col text-sm text-gray-700 gap-2 font-semibold">
+                            <label>Najniža cijena</label>
+                            <input name="myInput" className="bg-white rounded-md py-2 px-3 w-36 mr-2 mt-2"/>
+                        </div>
+                        <div className = "flex flex-col text-sm text-gray-700 gap-2 font-semibold">
+                            <label>Najviša cijena</label>
+                            <input name="myInput" className="bg-white rounded-md py-2 px-3 w-36 mr-2 mt-2"/>
+                        </div>
+                    </div>
                     <RangeSlider min={0} max={10} step={1}/>
                     <div className = "flex flex-row justify-evenly">
                         <button className="button fill-primary">
-                            Odaberi
+                            Pretraži
                         </button>
                         <button className="button">
-                            Odustani
+                            Poništi
                         </button>
                     </div>
                 </Accordion>
