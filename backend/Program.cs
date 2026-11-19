@@ -114,6 +114,14 @@ builder.Services.AddAuthentication(opt =>
     };
 });
 
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = 307;
+    options.HttpsPort = 5201;
+});
+
+builder.WebHost.UseUrls("https://localhost:5201/");
+
 var app = builder.Build();
 
 app.UseForwardedHeaders();
