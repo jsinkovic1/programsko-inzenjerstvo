@@ -3,7 +3,7 @@ ADD . /root
 USER root
 WORKDIR /root
 RUN dotnet build /root/backend/CharterBackend.csproj
-RUN dotnet dev-certs https --trust
+#RUN dotnet dev-certs https --trust
 RUN apt-get -y update \
     && apt-get install -y curl \
     && curl -sL https://deb.nodesource.com/setup_26.x | bash - \
