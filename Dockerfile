@@ -5,8 +5,8 @@ WORKDIR /root
 RUN mkdir /root/.aspnet
 RUN mkdir /root/.aspnet/https
 RUN dotnet build /root/backend/CharterBackend.csproj
-RUN sudo dotnet dev-certs https -ep /root/.aspnet/https/aspnetapp.pfx -p temptemptemp
-RUN sudo dotnet dev-certs https --trust
+RUN dotnet dev-certs https -ep /root/.aspnet/https/aspnetapp.pfx -p temptemptemp
+RUN dotnet dev-certs https --trust
 RUN apt-get -y update \
     && apt-get install -y curl \
     && curl -sL https://deb.nodesource.com/setup_26.x | bash - \
