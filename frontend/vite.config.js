@@ -15,11 +15,14 @@ export default defineConfig({
     envPrefix: "PUBLIC_",
     server:
         {
+            cors: {
+                origin: 'https://charterly.site',
+            },
             proxy:
                 {
-                    '/api':
+                    '^/api/*':
                         {
-                            target: 'https://charterly.site:5201',
+                            target: 'https://charterly.site',
                             changeOrigin: true,
                         }
                 },
