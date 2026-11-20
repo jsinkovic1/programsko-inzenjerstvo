@@ -24,6 +24,7 @@ export default defineConfig({
                         {
                             target: 'https://charterly.site',
                             changeOrigin: true,
+                            secure: false,
                         }
                 },
             allowedHosts:
