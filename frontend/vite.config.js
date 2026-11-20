@@ -23,10 +23,15 @@ export default defineConfig({
                     '/api':
                         {
                             target: 'https://charterly.site:5201',
-                            changeOrigin: true,
+                            changeOrigin: false,
                             secure: false,
-                            hostRewrite: "https://charterly.site:5201"
-                        }
+                            //hostRewrite: "https://charterly.site:5201"
+                    },
+                    '/signin-google': {
+                        target: 'https://charterly.site:5201/',
+                        changeOrigin: false,
+                        secure: false
+                    }
                 },
             allowedHosts:
             [
