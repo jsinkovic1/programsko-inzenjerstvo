@@ -6,7 +6,8 @@ RUN mkdir /root/.aspnet
 RUN mkdir /root/.aspnet/https
 RUN mkdir /root/.aspnet/dev-certs
 RUN mkdir /root/.aspnet/dev-certs/trust
-RUN dotnet build /root/backend/CharterBackend.csproj
+RUN dotnet restore /root/backend/CharterBackend.csproj
+RUN dotnet build --no-restore /root/backend/CharterBackend.csproj
 RUN dotnet dev-certs https -ep /root/.aspnet/https/aspnetapp.pfx -p temptemptemp
 ENV SSL_CERT_DIR="/root/.aspnet/dev-certs/trust"
 RUN dotnet dev-certs https --trust

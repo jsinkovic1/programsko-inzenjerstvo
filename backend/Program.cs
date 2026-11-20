@@ -117,10 +117,10 @@ builder.Services.AddAuthentication(opt =>
 builder.Services.AddHttpsRedirection(options =>
 {
     options.RedirectStatusCode = 307;
-    options.HttpsPort = 5173;
+    options.HttpsPort = 5201;
 });
 
-builder.WebHost.UseUrls("https://*:5173/");
+builder.WebHost.UseUrls("https://*:5201/");
 
 var app = builder.Build();
 

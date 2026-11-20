@@ -1,0 +1,21 @@
+﻿name: Restart HTTP server
+on:
+  workflow_dispatch: 
+    
+
+jobs:
+  restart:
+      runs-on: ubuntu-24.04
+      steps:
+        - name: Load image and restart HTTP server
+          uses: appleboy/ssh-action@v1
+          with:
+            host: "ec2-16-192-213-81.eu-north-1.compute.amazonaws.com"
+            username: "ubuntu"
+            key: ${{ secrets.SERVER_LOGIN }}
+            port: "22"
+            script: |
+              sudo docker stop charter-http-server
+              sudo docker load -i charter-httpserver
+              sudo docker system prune -f
+              sudo docker run -d -e HOST_ADDRESS="${{ vars.HOST_ADDRESS }}" -e HOST_PORT=${{ vars.HOST_PORT }} -e DATABASE_NAME=${{ secrets.DATABASE_NAME }} -e DATABASE_USER=${{ secrets.DATABASE_USER }} -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} -e JWT__SECRET=${{ secrets.JWT__SECRET }} -e SSL_CERT_DIR="$HOME/.aspnet/dev-certs/trust" --name charter-http-server --rm -p 5201:5201 -p 443:5173 charter/http-server:latest sh /root/entrypoint.sh
