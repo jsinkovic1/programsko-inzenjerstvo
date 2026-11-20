@@ -20,11 +20,12 @@ export default defineConfig({
             },
             proxy:
                 {
-                    '^/api/*':
+                    '/api':
                         {
-                            target: 'https://charterly.site',
+                            target: 'https://charterly.site:5201',
                             changeOrigin: true,
                             secure: false,
+                            hostRewrite: "https://charterly.site:5201"
                         }
                 },
             allowedHosts:

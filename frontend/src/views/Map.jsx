@@ -34,7 +34,7 @@ function HarborMarker({ position, name }) {
     const [vesselCards, SetVesselCards] = useState("")
 
     useEffect(() => {
-       fetch("https://charterly.site:5201/api/filter", {
+       fetch("/api/filter", {
             method: "POST",
             body: JSON.stringify({ harborName: name }),
             headers: {
@@ -44,7 +44,7 @@ function HarborMarker({ position, name }) {
     }, [name]);
     const eventHandlers = useMemo(() => ({
         async popupopen() {
-            const response = await fetch("https://charterly.site:5201/api/filter", {
+            const response = await fetch("/api/filter", {
                 method: "POST",
                 body: JSON.stringify({ harborName: name }),
                 headers: {
@@ -76,7 +76,7 @@ function Map() {
     const [pins, setPins] = useState(null)
 
     useEffect(() => {
-        fetch("https://charterly.site:5201/api/luka").then(response => response.json()).then(data => {
+        fetch("/api/luka").then(response => response.json()).then(data => {
             setPins(data)
         })
     }, [])
