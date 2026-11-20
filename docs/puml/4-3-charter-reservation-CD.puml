@@ -114,7 +114,7 @@ end note
 note bottom of KalkulatorIznosa
   iznos = dnevna cijena × dani
         + oprema × količina × dani
-        + usluge × količina
+        + zbroj cijena usluga
 end note
 
 note bottom of RazdobljeNajma
