@@ -120,7 +120,7 @@ builder.Services.AddHttpsRedirection(options =>
     options.HttpsPort = 5173;
 });
 
-builder.WebHost.UseUrls("https://0.0.0.0:5173/");
+builder.WebHost.UseUrls("https://192.168.64.1:5173/");
 
 var app = builder.Build();
 
