@@ -16,10 +16,10 @@ namespace CharterBackend.Services
         // Omogućuje pristup trenutnom HTTP kontekstu, uključujući zahtjev i odgovor
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthTokenProcessor(IConfiguration config, IHttpContextAccessor httpContextAccessor)
+        public AuthTokenProcessor(JwtOptions jwt, IHttpContextAccessor httpContextAccessor)
         {
             // Učitavaju se JWT postavke iz konfiguracijskog odjeljka aplikacije
-            _jwt = config.GetSection(JwtOptions.JwtOptionsKey).Get<JwtOptions>() ?? throw new ArgumentException(nameof(JwtOptions));
+            _jwt = jwt;
             _httpContextAccessor = httpContextAccessor;
         }
 

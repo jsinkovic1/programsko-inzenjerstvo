@@ -58,6 +58,18 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthTokenProcessor, AuthTokenProcessor>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
+//definiranje JWT postavki iz konfiguracije
+var jwtOptions = new JwtOptions
+{
+    Issuer = builder.Configuration["Jwt:Issuer"] ?? "CharterBackend",
+    Audience = builder.Configuration["Jwt:Audience"] ?? "CharterFrontend",
+    Secret = builder.Configuration["Jwt:Secret"]
+        ?? throw new InvalidOperationException("Jwt:Secret nije postavljen")
+};
+
+// registrira se JwtOptions kao singleton kako bi bio dostupan kroz cijelu aplikaciju
+builder.Services.AddSingleton(jwtOptions);
+
 // Postavlja se JWT kao zadana shema za autentikaciju i izazivanje prijave
 builder.Services.AddAuthentication(opt =>
 {
@@ -87,10 +99,6 @@ builder.Services.AddAuthentication(opt =>
 
 }).AddJwtBearer(options =>
 {
-    // Učitavaju se postavke za provjeru JWT tokena
-    var jwtOptions = builder.Configuration.GetSection(JwtOptions.JwtOptionsKey)
-        .Get<JwtOptions>() ?? throw new ArgumentException(nameof(JwtOptions));
-
     // Za prihvaćanje tokena provjeravaju se izdavatelj, publika, rok trajanja i potpis
     options.TokenValidationParameters = new TokenValidationParameters
     {
