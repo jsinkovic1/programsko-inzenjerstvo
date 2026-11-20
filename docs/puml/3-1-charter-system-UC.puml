@@ -30,18 +30,26 @@ skinparam rectangle {
 }
 hide stereotype
 
+actor "Korisnik" as korisnik
 actor "Posjetitelj" as posjetitelj
 actor "Klijent" as klijent
 actor "Djelatnik" as djelatnik
 actor "Voditelj" as voditelj
 actor "Administrator" as admin
 
-actor "Pružatelj identiteta\n(AAI@EduHr)" as aai <<external system>>
-actor "Kartografski\nservis" as maps <<external system>>
+actor "Google\n(prijava, OAuth 2.0)" as google <<external system>>
+actor "Kartografski servis\n(Thunderforest)" as maps <<external system>>
 actor "Meteorološki\nservis" as meteo <<external system>>
 actor "Servis za slanje\ne-pošte" as mail <<external system>>
 
-rectangle "Sustav za charter poslovanje" {
+' Svi konkretni akteri nasljeđuju zajednički akter Korisnik
+korisnik <|-- posjetitelj
+korisnik <|-- klijent
+korisnik <|-- djelatnik
+korisnik <|-- voditelj
+korisnik <|-- admin
+
+rectangle "Charterly – sustav za charter poslovanje" {
     usecase "UC-011: Pregled statistike\ni izvoz izvještaja" as UC11
     usecase "UC-010: Upravljanje flotom,\ncjenicima i nedostupnošću" as UC10
     usecase "UC-009: Obrada rezervacija i\ndodjela djelatnika" as UC9
@@ -52,36 +60,30 @@ rectangle "Sustav za charter poslovanje" {
     usecase "UC-004: Izrada zahtjeva\nza rezervaciju" as UC4
     usecase "UC-003: Pregled detalja plovila,\nkarte i vremenske prognoze" as UC3
     usecase "UC-002: Pretraživanje i\nfiltriranje plovila" as UC2
-    usecase "UC-001: Prijava u sustav\nputem AAI@EduHr" as UC1
+    usecase "UC-001: Prijava u sustav\nputem Google računa" as UC1
 }
 
+korisnik --> UC2
+korisnik --> UC3
+UC3 --> maps
+UC3 --> meteo
+
 posjetitelj --> UC1
-UC1 --> aai
+UC1 --> google
 
-posjetitelj --> UC2
-posjetitelj --> UC3
-
-klijent --> UC2
-klijent --> UC3
 klijent --> UC4
 klijent --> UC5
 klijent --> UC6
 UC6 --> mail
 
-UC3 --> maps
-UC3 --> meteo
-
-djelatnik --> UC3
 djelatnik --> UC7
 
 admin --> UC8
 admin --> UC9
-admin --> UC3
 UC9 --> mail
 admin --> UC10
 admin --> UC11
 
 voditelj --> UC11
-voditelj --> UC3
 
 @enduml

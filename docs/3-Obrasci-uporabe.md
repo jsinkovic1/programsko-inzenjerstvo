@@ -6,13 +6,13 @@
 
 **Cilj:** Prikazati granicu sustava, relevantne aktere i njihove glavne ciljeve u preglednom UML dijagramu obrazaca uporabe.
 
-![Dijagram obrazaca uporabe sustava za charter poslovanje](./assets/diagrams/3-1-charter-system-UC.svg)
+![Dijagram obrazaca uporabe sustava Charterly](./assets/diagrams/3-1-charter-system-UC.svg)
 
-**Slika 3.1. Dijagram obrazaca uporabe sustava za charter poslovanje**
+**Slika 3.1. Dijagram obrazaca uporabe sustava Charterly**
 
 **PlantUML izvor:** [izvor](./puml/3-1-charter-system-UC.puml)
 
-**Provjera dijagrama:** Dijagram prikazuje primarne ljudske aktere (posjetitelj, klijent, djelatnik, voditelj charter tvrtke i administrator sustava) te sekundarne vanjske sustave (AAI@EduHr, meteorološki servis, kartografski servis i servis za slanje e-pošte). Svaki akter ima izravno povezane obrasce uporabe u skladu sa svojim ovlastima, pri čemu postupak prijave (UC-001) pokreće posjetitelj kako bi pristupio sustavu, dok je pregled detalja plovila, karte i vremenske prognoze (UC-003) omogućen svim akterima. Odabir dodatnih usluga i dodatne opreme čini sastavni korak obrasca izrade rezervacije, pa je izbjegnuto nepotrebno usložnjavanje dijagrama relacijama `<<extend>>` i `<<include>>`.
+**Provjera dijagrama:** Dijagram prikazuje primarne ljudske aktere (posjetitelj, klijent, djelatnik, voditelj charter tvrtke i administrator sustava) te sekundarne vanjske sustave (Google kao pružatelja identiteta, meteorološki servis, kartografski servis Thunderforest i servis za slanje e-pošte). Pretraživanje plovila (UC-002) i pregled detalja plovila, karte i vremenske prognoze (UC-003) dostupni su svim korisnicima. Zato su povezani sa zajedničkim akterom *Korisnik*, a svih pet ljudskih aktera ga nasljeđuje (strelica s praznim trokutom označava generalizaciju: „klijent je vrsta korisnika”). Tako je izbjegnuto pet istovjetnih veza prema istim obrascima. Ostali obrasci povezani su samo s akterom koji ih smije izvesti; postupak prijave (UC-001) pokreće posjetitelj kako bi postao prijavljeni korisnik. Odabir dodatnih usluga i dodatne opreme čini sastavni korak obrasca izrade rezervacije, pa je izbjegnuto nepotrebno usložnjavanje dijagrama relacijama `<<extend>>` i `<<include>>`.
 
 ## 3.2 Specifikacije obrazaca uporabe
 
@@ -20,25 +20,25 @@
 
 **Napomena o oznakama statusa:** Statusi rezervacije u specifikacijama zapisani su šiframa: `ZAHTJEV` = „zahtjev za rezervaciju", `POTVRDENA` = „potvrđena", `OTKAZANA` = „otkazana", `ZAVRSENA` = „završeni najam".
 
-### UC-001: Prijava u sustav putem AAI@EduHr
+### UC-001: Prijava u sustav putem Google računa
 
 | Element specifikacije | Opis |
 | :--- | :--- |
 | **Primarni akter** | Posjetitelj (A-01) |
-| **Sekundarni akter** | AAI@EduHr pružatelj identiteta (A-06) |
+| **Sekundarni akter** | Google kao pružatelj identiteta (A-06) |
 | **Povezani zahtjevi** | C-01, NF-02, NF-05, NF-06, AS-11 |
-| **Preduvjeti** | Korisnik posjeduje važeći AAI@EduHr elektronički identitet. |
-| **Glavni uspješni tok** | 1. Posjetitelj odabire prijavu putem AAI@EduHr sustava.<br>2. Aplikacija preusmjerava korisnika na središnje sučelje pružatelja identiteta.<br>3. Korisnik unosi pristupne podatke i potvrđuje prijenos identifikatora, imena, prezimena i adrese e-pošte.<br>4. Pružatelj identiteta autentificira korisnika i vraća ga u aplikaciju s OAuth 2.0 autorizacijskim kodom.<br>5. Sustav provjerava postojanje računa prema AAI@EduHr identifikatoru i e-pošti:<br>&nbsp;&nbsp;&nbsp;a) ako račun postoji i aktivan je (`aktivan = TRUE`), dohvaća se dodijeljena uloga (i specijalnost ako je djelatnik);<br>&nbsp;&nbsp;&nbsp;b) ako korisnik pristupa prvi put, sustav stvara novi račun s ulogom klijenta i postavlja ga u aktivno stanje.<br>6. Sustav uspostavlja zaštićenu sesiju i prilagođava korisničko sučelje pripadajućoj ulozi (klijent, djelatnik, voditelj ili administrator). |
-| **Alternativni tokovi / Iznimke** | **3a — Neuspjela autentifikacija ili odustajanje:** Pružatelj identiteta odbija vjerodajnice ili korisnik prekida postupak; sesija se ne stvara, a korisnik ostaje neautentificirani posjetitelj.<br>**5a — Deaktiviran račun:** Ako račun u bazi ima status `aktivan = FALSE`, sustav prekida prijavu, odbacuje tokene i prikazuje poruku o deaktivaciji računa. |
+| **Preduvjeti** | Korisnik posjeduje Google račun. |
+| **Glavni uspješni tok** | 1. Posjetitelj odabire prijavu putem Google računa.<br>2. Aplikacija preusmjerava korisnika na Googleovu stranicu za prijavu.<br>3. Korisnik se prijavljuje Google računom i odobrava aplikaciji pristup svojem imenu, prezimenu i adresi e-pošte.<br>4. Google vraća korisnika u aplikaciju s OAuth 2.0 autorizacijskim kodom, a poslužitelj ga zamjenjuje za podatke o identitetu korisnika.<br>5. Sustav traži račun prema Googleovom jedinstvenom identifikatoru korisnika:<br>&nbsp;&nbsp;&nbsp;a) ako račun postoji i aktivan je (`aktivan = TRUE`), dohvaća se dodijeljena uloga (za djelatnika uloga označava i njegovu specijalnost);<br>&nbsp;&nbsp;&nbsp;b) ako korisnik pristupa prvi put, sustav stvara novi račun s ulogom klijenta i postavlja ga u aktivno stanje.<br>6. Sustav izdaje vlastiti pristupni token s ulogom korisnika, sprema ga u zaštićeni kolačić preglednika i prilagođava korisničko sučelje pripadajućoj ulozi (klijent, djelatnik, voditelj ili administrator). |
+| **Alternativni tokovi / Iznimke** | **3a — Neuspjela autentifikacija ili odustajanje:** Google odbija prijavu ili korisnik prekida postupak; pristupni token se ne izdaje, a korisnik ostaje neautentificirani posjetitelj.<br>**5a — Deaktiviran račun:** Ako račun u bazi ima status `aktivan = FALSE`, sustav prekida prijavu i ne izdaje pristupni token. |
 | **Posljedice (ishod)** | Korisnik je autentificiran bez pohrane lokalnih lozinki; aplikacija mu dodjeljuje radno okruženje ovisno o ulozi. |
 
 ### UC-002: Pretraživanje i filtriranje plovila
 
 | Element specifikacije | Opis |
 | :--- | :--- |
-| **Primarni akter** | Posjetitelj (A-01) / Klijent (A-02) |
+| **Primarni akter** | Korisnik: posjetitelj i svi prijavljeni korisnici (A-01 – A-05) |
 | **Povezani zahtjevi** | F-002, F-003, F-008, AS-02, AS-03, AS-10 |
-| **Preduvjeti** | U bazi postoje aktivna plovila i definirane matične luke. |
+| **Preduvjeti** | U bazi postoje plovila i definirane matične luke. |
 | **Glavni uspješni tok** | 1. Korisnik otvara katalog plovila te zadaje kriterije: naziv, razdoblje najma (datum i vrijeme preuzimanja i povrata), matičnu luku, vrstu plovila i potreban kapacitet osoba.<br>2. Sustav provjerava valjanost unesenog razdoblja.<br>3. Sustav izračunava broj dana najma prema pravilu AS-03 (zaokruživanje na 24-satna razdoblja naviše).<br>4. Sustav pronalazi plovila koja zadovoljavaju kriterije i koja u tablici zauzetosti nemaju preklapanja u traženom intervalu.<br>5. Za svako dostupno plovilo sustav prikazuje osnovne podatke i izračunatu cijenu najma za zadano razdoblje.<br>6. Prikazuje se filtrirani popis plovila. |
 | **Alternativni tokovi / Iznimke** | **2a — Neispravno razdoblje:** Vrijeme preuzimanja je u prošlosti ili je povrat prije preuzimanja; sustav odbija pretragu uz poruku upozorenja.<br>**4a — Nema rezultata:** Niti jedno plovilo ne zadovoljava zadane uvjete; sustav prikazuje obavijest o nepostojanju slobodnih plovila i predlaže izmjenu parametara. |
 | **Posljedice (ishod)** | Korisnik ima uvid u slobodna plovila i točan izračun cijene osnovnog najma za odabrani termin. |
@@ -47,11 +47,11 @@
 
 | Element specifikacije | Opis |
 | :--- | :--- |
-| **Primarni akter** | Posjetitelj (A-01) / Klijent (A-02) / Djelatnik (A-03) / Voditelj (A-04) / Administrator (A-05) |
-| **Sekundarni akteri** | Meteorološki servis (A-07), Kartografski servis (A-08) |
+| **Primarni akter** | Korisnik: posjetitelj i svi prijavljeni korisnici (A-01 – A-05) |
+| **Sekundarni akteri** | Meteorološki servis (A-07), Kartografski servis Thunderforest (A-08) |
 | **Povezani zahtjevi** | F-002, F-004, F-005, F-006, C-02, C-03, NF-04, NF-06, AS-08 |
-| **Preduvjeti** | Plovilo je evidentirano i aktivno u katalogu. |
-| **Glavni uspješni tok** | 1. Korisnik odabire plovilo iz kataloga ili rezultata pretrage.<br>2. Sustav prikazuje tehničke detalje plovila, osnovnu opremu, galeriju fotografija (s označenom glavnom slikom) i cijenu po danu najma.<br>3. Sustav generira i prikazuje kalendar zauzetosti plovila (prikaz zauzetih i servisnih termina bez otkrivanja identiteta klijenata).<br>4. Sustav šalje koordinate matične luke kartografskom servisu i prikazuje interaktivnu kartu mjesta preuzimanja.<br>5. Sustav šalje upit meteorološkom servisu za odabrano razdoblje i lokaciju te prikazuje podatke o temperaturi, vjetru i vremenskim uvjetima. |
+| **Preduvjeti** | Plovilo je evidentirano u katalogu. |
+| **Glavni uspješni tok** | 1. Korisnik odabire plovilo iz kataloga ili rezultata pretrage.<br>2. Sustav prikazuje tehničke detalje plovila, osnovnu opremu, galeriju fotografija (s označenom glavnom slikom) i cijenu po danu najma.<br>3. Sustav generira i prikazuje kalendar zauzetosti plovila (prikaz zauzetih i servisnih termina bez otkrivanja identiteta klijenata).<br>4. Sustav prikazuje interaktivnu kartu s oznakom matične luke (mjesta preuzimanja); kartografske pločice dohvaća preglednik izravno od kartografskog servisa.<br>5. Sustav šalje upit meteorološkom servisu za odabrano razdoblje i lokaciju te prikazuje podatke o temperaturi, vjetru i vremenskim uvjetima. |
 | **Alternativni tokovi / Iznimke** | **4a — Kartografski servis nedostupan:** Prikazuje se tekstualna obavijest o nedostupnosti karte; ostali podaci ostaju dostupni.<br>**5a — Meteorološki servis nedostupan ili izvan dometa:** Prikazuje se obavijest o nedostupnosti prognoze za traženi termin, a stranica nastavlja s radom. |
 | **Posljedice (ishod)** | Korisnik raspolaže potpunim informacijama o plovilu, lokaciji matične baze i meteorološkim uvjetima. |
 
@@ -109,7 +109,7 @@
 | **Povezani zahtjevi** | F-001, NF-02, AS-11 |
 | **Preduvjeti** | Administrator je prijavljen u sustav. |
 | **Glavni uspješni tok** | 1. Administrator otvara modul za upravljanje korisničkim računima.<br>2. Sustav prikazuje popis korisnika (ime, prezime, e-pošta, uloga, specijalnost, status aktivnosti).<br>3. Administrator odabire korisnika i mijenja mu ulogu (klijent, djelatnik, voditelj, administrator).<br>4. Ako je odabrana uloga „djelatnik”, administrator obavezno odabire njegovu specijalnost (skiper, mehaničar, kuhar, čistač i sl.).<br>5. Za uloge koje nisu djelatnik, sustav onemogućuje odabir specijalnosti.<br>6. Administrator može aktivirati ili deaktivirati račun korisnika.<br>7. Administrator potvrđuje izmjene; sustav ažurira podatke u bazi. |
-| **Alternativni tokovi / Iznimke** | **4a — Djelatniku nije dodijeljena specijalnost:** Sustav odbija spremanje promjene uz poruku da je specijalnost obavezna za djelatnike.<br>**6a — Deaktivacija zadnjeg aktivnog administratora:** Sustav provjerava ukupan broj aktivnih administratora i odbija deaktivaciju ili promjenu uloge ako se radi o jedinom preostalom administratoru. |
+| **Alternativni tokovi / Iznimke** | **4a — Djelatniku nije dodijeljena specijalnost:** Sustav odbija spremanje promjene uz poruku da je specijalnost obavezna za djelatnike. |
 | **Posljedice (ishod)** | Korisnički račun ima ažurirana prava i ulogu, što izravno određuje njegove mogućnosti pri sljedećem zahtjevu prema poslužitelju. |
 
 ### UC-009: Obrada rezervacija i dodjela djelatnika
@@ -118,11 +118,11 @@
 | :--- | :--- |
 | **Primarni akter** | Administrator sustava (A-05) |
 | **Sekundarni akter** | Servis za slanje e-pošte (A-09) |
-| **Povezani zahtjevi** | F-009, F-012, F-014, F-017, C-04, NF-04, AS-01, AS-14 |
+| **Povezani zahtjevi** | F-009, F-012, F-014, F-017, C-04, NF-04, AS-01 |
 | **Preduvjeti** | Administrator je prijavljen; u sustavu postoje rezervacije za obradu. |
-| **Glavni uspješni tok** | 1. Administrator otvara pregled rezervacija, primjenjuje filtre i odabire zahtjev za rezervaciju.<br>2. Administrator rezervaciji (u statusu `ZAHTJEV` ili `POTVRDENA`) dodjeljuje djelatnike (odabir aktivnih korisnika s ulogom djelatnika). Sustav pri dodjeli provjerava preklapanje djelatnika s drugim rezervacijama i prikazuje informativno upozorenje s popisom tih rezervacija.<br>3. Administrator odabire akciju `POTVRDENA`. Sustav pri potvrdi provjerava je li specijalnost koju zahtijeva neka odabrana usluga pokrivena dodijeljenim djelatnicima i, ako nije, prikazuje informativno upozorenje; potvrda ostaje moguća.<br>4. Sustav mijenja status rezervacije u `POTVRDENA`.<br>5. Sustav putem servisa e-pošte klijentu šalje potvrdu rezervacije s podacima o plovilu, razdoblju, uslugama i opremom, iznosu i mjestu preuzimanja.<br>6. Sustav bilježi slanje obavijesti. |
-| **Alternativni tokovi / Iznimke** | **2a — Dodjela na već potvrđenoj rezervaciji:** Administrator može dodavati i uklanjati djelatnike i nakon potvrde (F-014).<br>**3a — Administrator odbija zahtjev:** Administrator odabire odbijanje; sustav postavlja status na `OTKAZANA`, oslobađa termin plovila i šalje klijentu obavijest o odbijanju.<br>**3b — Otkazivanje ranije potvrđene rezervacije:** Administrator otkazuje potvrđenu rezervaciju prije početka najma; status prelazi u `OTKAZANA`, a termin se oslobađa.<br>**5a — Neuspjelo slanje potvrdne e-pošte:** Status rezervacije ostaje `POTVRDENA`, u bazi se bilježi neuspjeh slanja, a administrator dobiva upozorenje o potrebi provjere servisa (NF-04). |
-| **Posljedice (ishod)** | Rezervacija je potvrđena (ili otkazana), djelatnici su pridruženi najmu, a klijentu je isporučena obavijest e-poštom. |
+| **Glavni uspješni tok** | 1. Administrator otvara pregled rezervacija, primjenjuje filtre i odabire zahtjev za rezervaciju.<br>2. Administrator rezervaciji (u statusu `ZAHTJEV` ili `POTVRDENA`) dodjeljuje djelatnike (odabir aktivnih korisnika s ulogom djelatnika). Sustav pri dodjeli provjerava preklapanje djelatnika s drugim rezervacijama i prikazuje upozorenje s popisom tih rezervacija.<br>3. Administrator odabire akciju `POTVRDENA`.<br>4. Sustav mijenja status rezervacije u `POTVRDENA`.<br>5. Sustav putem servisa e-pošte klijentu šalje potvrdu rezervacije s podacima o plovilu, razdoblju, uslugama i opremom, iznosu i mjestu preuzimanja.<br>6. Sustav bilježi slanje obavijesti. |
+| **Alternativni tokovi / Iznimke** | **2a — Dodjela na već potvrđenoj rezervaciji:** Administrator može dodavati i uklanjati djelatnike i nakon potvrde (F-014).<br>**3a — Administrator odbija zahtjev:** Administrator odabire odbijanje; sustav postavlja status na `OTKAZANA`, oslobađa termin plovila i šalje klijentu obavijest o otkazivanju.<br>**5a — Neuspjelo slanje potvrdne e-pošte:** Status rezervacije ostaje `POTVRDENA`, u bazi se bilježi neuspjeh slanja, a administrator dobiva upozorenje o potrebi provjere servisa (NF-04). |
+| **Posljedice (ishod)** | Rezervacija je potvrđena (ili je zahtjev odbijen), djelatnici su pridruženi najmu, a klijentu je isporučena obavijest e-poštom. |
 
 ### UC-010: Upravljanje flotom, cjenicima i razdobljima nedostupnosti
 
@@ -132,7 +132,7 @@
 | **Povezani zahtjevi** | F-008, F-015, F-016, F-018, AS-05 |
 | **Preduvjeti** | Administrator je prijavljen u sustav. |
 | **Glavni uspješni tok** | 1. Administrator odabire operaciju nad resursima: plovila, matične luke, vrste plovila, oprema, fotografije, cijene ili razdoblja nedostupnosti.<br>2. Pri unosu/uređivanju plovila zadaju se karakteristike, matična luka, dnevna cijena, osnovna oprema i fotografije (određuje se najviše jedna glavna slika).<br>3. Pri unosu usluga i dodatne opreme definiraju se nazivi i cijene (usluge jednokratno, oprema po danu najma).<br>4. Pri evidenciji nedostupnosti plovila administrator unosi razdoblje i razlog (servis, održavanje, drugo).<br>5. Sustav provjerava preklapa li se razdoblje nedostupnosti s postojećim rezervacijama u statusu `ZAHTJEV` ili `POTVRDENA`.<br>6. Sustav sprema promjene; podaci postaju vidljivi u katalogu, a plovilo u servisu nedostupno za rezervacije. |
-| **Alternativni tokovi / Iznimke** | **2a — Pokušaj trajnog brisanja plovila s rezervacijama:** Sustav odbija brisanje i omogućuje isključivo deaktivaciju plovila (F-015).<br>**5a — Preklapanje nedostupnosti s postojećom rezervacijom:** Sustav odbija unos nedostupnosti uz obavijest o konfliktu dok se rezervacija ne otkaže (F-018). |
+| **Alternativni tokovi / Iznimke** | **2a — Pokušaj brisanja plovila s rezervacijama:** Sustav odbija brisanje plovila koje ima rezervacije (F-015).<br>**5a — Preklapanje nedostupnosti s postojećom rezervacijom:** Sustav odbija unos nedostupnosti uz obavijest o konfliktu dok se rezervacija ne otkaže (F-018). |
 | **Posljedice (ishod)** | Flota, cjenici i termini servisa ažurirani su u bazi podataka bez utjecaja na iznose već sklopljenih rezervacija. |
 
 ### UC-011: Pregled statistike poslovanja i izvoz izvještaja
@@ -153,5 +153,5 @@
 | Provjera | Pitanje za tim | Nalaz i usklađenost |
 | :--- | :--- | :--- |
 | **Zahtjev** | Je li svaki važan obrazac uporabe povezan s postojećim zahtjevom? | Svih 19 funkcijskih zahtjeva (F-001 do F-019) izravno je pokriveno kroz 11 cjelovitih specifikacija obrazaca uporabe. Pretpostavka AS-13 (automatski završetak najma) primijenjena je u UC-005, UC-007 i UC-011. |
-| **Akter** | Odgovara li akter naveden ovdje prethodno utvrđenoj ulozi i dopuštenoj interakciji? | Akteri u potpunosti odgovaraju dionicima iz odjeljka 2.3. Djelatnik posjeduje specijalnost, prijava se provodi isključivo kroz AAI@EduHr (C-01), a vanjski servisi djeluju kao sekundarni akteri. |
-| **Aplikacija** | Može li tim demonstrirati opisani glavni rezultat i važnu alternativu ili je opis jasno označen kao trenutačno oblikovanje? | Svi tokovi i alternative (npr. sprječavanje preklapanja, prekid slanja e-pošte bez rušenja transakcije, kontrola zadnjeg administratora) provjerljivi su testnim slučajevima koji će se navesti u matrici sljedivosti (2.6). |
+| **Akter** | Odgovara li akter naveden ovdje prethodno utvrđenoj ulozi i dopuštenoj interakciji? | Akteri u potpunosti odgovaraju dionicima iz odjeljka 2.3. Djelatnik posjeduje specijalnost, prijava se provodi isključivo putem Google računa (C-01), a vanjski servisi djeluju kao sekundarni akteri. Zajednički akter *Korisnik* u dijagramu nije nova uloga, nego objedinjuje sve ljudske aktere za obrasce dostupne svima. |
+| **Aplikacija** | Može li tim demonstrirati opisani glavni rezultat i važnu alternativu ili je opis jasno označen kao trenutačno oblikovanje? | Sredinom projekta mogu se demonstrirati UC-001 (prijava putem Google računa), UC-002 (pretraga i filtriranje plovila) i dio UC-003 (detalji plovila i karta luka); ostali obrasci opisuju trenutačno oblikovanje. Ispitni slučajevi za tokove i alternative (npr. sprječavanje preklapanja, prekid slanja e-pošte bez rušenja transakcije) definirat će se u drugoj polovici projekta. |

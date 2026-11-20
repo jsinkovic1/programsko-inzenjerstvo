@@ -30,10 +30,9 @@ ZAHTJEV --> ZAHTJEV : klijent mijenja zahtjev\n[novi termin slobodan] / ponovno 
 
 ZAHTJEV --> POTVRDENA : administrator potvrđuje\n/ pošalji potvrdu e-poštom
 ZAHTJEV --> OTKAZANA : klijent povlači zahtjev\n/ pošalji obavijest o otkazivanju
-ZAHTJEV --> OTKAZANA : administrator odbija\n/ pošalji obavijest o odbijanju
+ZAHTJEV --> OTKAZANA : administrator odbija\n/ pošalji obavijest o otkazivanju
 
 POTVRDENA --> OTKAZANA : klijent otkazuje [sada < preuzimanje]\n/ pošalji obavijest o otkazivanju
-POTVRDENA --> OTKAZANA : administrator otkazuje\n/ pošalji obavijest o otkazivanju
 POTVRDENA --> ZAVRSENA : [sada >= povrat]\n(automatski)
 
 OTKAZANA --> [*]
