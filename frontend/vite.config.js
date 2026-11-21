@@ -15,18 +15,28 @@ export default defineConfig({
     envPrefix: "PUBLIC_",
     server:
         {
+            cors: {
+                origin: 'https://charterly.site',
+            },
             proxy:
                 {
                     '/api':
                         {
-                            target: 'http://16.192.213.81:5201',
-                            changeOrigin: true,
-                        }
+                            target: 'https://charterly.site:5201',
+                            changeOrigin: false,
+                            secure: false,
+                            //hostRewrite: "https://charterly.site:5201"
+                        },
+                    '/signin-google': {
+                        target: 'https://charterly.site:5201/',
+                        changeOrigin: false,
+                        secure: false
+                    }
                 },
             allowedHosts:
-            [
-                "charterly.site"
-            ]
+                [
+                    "charterly.site"
+                ]
         }
 
 })
