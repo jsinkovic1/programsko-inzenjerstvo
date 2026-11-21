@@ -27,7 +27,7 @@ class Header extends Component {
           Charterly
         </h1>
 
-        <button className={"button icon-button fill-primary dropdown h-10"}>
+        <button className={"button icon-button fill-primary dropdown h-10 z-9999"}>
             <FaUserCircle></FaUserCircle>
             <div className={"dropdown-content right-0"}>
                 <a href={"/login"}>
