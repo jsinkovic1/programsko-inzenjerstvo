@@ -7,6 +7,7 @@ import {CardMedium, CardSmall} from "../components/Cards.jsx";
 import {useEffect, useState} from "react";
 import Vessel from "../models/Vessel.js";
 import {MdInsertEmoticon} from "react-icons/md";
+import Accordion from "../components/Accordion.jsx";
 
 
 function Gallery() {
@@ -34,8 +35,8 @@ function Gallery() {
                     Button (accent fill)
                 </button>
 
-                {/* Accordion element, koristan za filtere */}
-                <DropdownDiv header={"Accordion"}>
+                {/* DropdownDiv element, koristan za filtere */}
+                <DropdownDiv header={"DropdownDiv"}>
                     <button onClick={() => nav("/map")} className={"button fill-primary"}>
                         Lorem ipsum
                     </button>
@@ -43,6 +44,15 @@ function Gallery() {
                         Lorem ipsum
                     </button>
                 </DropdownDiv>
+
+                <Accordion header={"Accordion"}>
+                    <button onClick={() => nav("/map")} className={"button fill-primary"}>
+                        Lorem ipsum
+                    </button>
+                    <button onClick={() => nav("/map")} className={"button fill-primary"}>
+                        Lorem ipsum
+                    </button>
+                </Accordion>
 
                 {/* Text input */}
                 <input type="text" placeholder={"Text input"} className="text-input"/>
