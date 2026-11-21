@@ -1,8 +1,8 @@
 ﻿import {Component} from "react";
-import "./Accordion.css"
+import "./DropdownDiv.css"
 import {FaMinus, FaPlus} from "react-icons/fa6";
 
-class Accordion extends Component {
+class DropdownDiv extends Component {
     state = {
         collapsed: true,
     };
@@ -17,12 +17,12 @@ class Accordion extends Component {
 
     render() {
         return (
-            <div className={this.state.collapsed ? "accordion-collapsed flex flex-col" : "accordion-expanded flex flex-col"}>
-                <div onClick={this.handleClick} className={"accordion-header"}>
+            <div className={this.state.collapsed ? "dropdown-div-collapsed flex flex-col" : "dropdown-div-expanded flex flex-col"}>
+                <div onClick={this.handleClick} className={"dropdown-div-header"}>
                     {this.state.collapsed ? <FaPlus className={"mr-1"} /> : <FaMinus className={"mr-1"}/>}
                     {this.props.header}
                 </div>
-                <div className={"accordion-content-wrapper"}>
+                <div className={"dropdown-div-content-wrapper"}>
                     {this.props.children}
                 </div>
             </div>)
@@ -30,4 +30,4 @@ class Accordion extends Component {
 
 }
 
-export default Accordion
+export default DropdownDiv

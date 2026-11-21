@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import placeholder from "../assets/placeholder.svg";
 import { useNavigate } from 'react-router-dom';
 import Search from "./Search"
-import Accordion from "../components/Accordion.jsx";
+import DropdownDiv from "../components/DropdownDiv.jsx";
 import RangeSlider from "../components/RangeSlider.jsx";
 
 function Details()
@@ -82,7 +82,7 @@ function Details()
                 <div className="relative">
                     
                 </div>
-                <Accordion header={"Cijena"}>
+                <DropdownDiv header={"Cijena"}>
                     <div className = "flex flex-row">
                         <div className = "flex flex-col text-sm text-gray-700 gap-2 font-semibold">
                             <label>Najniža cijena</label>
@@ -102,7 +102,7 @@ function Details()
                             Poništi
                         </button>
                     </div>
-                </Accordion>
+                </DropdownDiv>
             </div>
             {cards}
         </div>

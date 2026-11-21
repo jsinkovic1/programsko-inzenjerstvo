@@ -1,26 +1,26 @@
 ﻿@import "tailwindcss";
 @import "../App.css";
 
-.accordion-collapsed
+.dropdown-div-collapsed
 {
     @apply font-sans bg-gray-100 hover:bg-gray-200 focus:bg-gray-400 rounded-md shadow-md p-2 transition-all duration-300 ease-in-out h-fit gap-2
 }
 
-.accordion-expanded
+.dropdown-div-expanded
 {
     @apply font-sans bg-gray-100 hover:bg-gray-200 focus:bg-gray-400 rounded-md shadow-md p-2 transition-all duration-300 ease-in-out h-fit gap-2 relative z-50 
 }
 
-.accordion-header
+.dropdown-div-header
 {
     @apply font-title text-base flex flex-row items-center mb-2 cursor-pointer
 }
 
-.accordion-content-wrapper
+.dropdown-div-content-wrapper
 {
     @apply hidden w-full flex-col gap-2;
 }
 
-.accordion-expanded .accordion-content-wrapper {
+.dropdown-div-expanded .dropdown-div-content-wrapper {
     @apply flex absolute top-full left-0 w-max z-50 bg-gray-100 shadow-xl rounded-md p-3 mt-1 flex-col gap-2 border border-gray-200;
 }

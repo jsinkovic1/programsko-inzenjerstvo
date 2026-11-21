@@ -5,7 +5,7 @@ import {useEffect, useMemo, useState} from "react";
 import "./Map.css"
 import {DivIcon} from "leaflet/src/layer/index.js";
 import placeholder from "../assets/placeholder.svg"
-import Accordion from "../components/Accordion.jsx";
+import DropdownDiv from "../components/DropdownDiv.jsx";
 import {CardSmall} from "../components/Cards.jsx";
 import Vessel from "../models/Vessel.js";
 import RangeSlider from "../components/RangeSlider.jsx";
@@ -104,14 +104,14 @@ function Map() {
 
             <div className={"w-70 absolute z-1000 top-16 flex flex-col gap-2 p-2"}>
                 <input type="text" placeholder={"Naziv plovila"} className="text-input"/>
-                <Accordion header={"Filter"}>
+                <DropdownDiv header={"Filter"}>
                     Kapacitet
                     <RangeSlider min={1} max={10} step={1}/>
                     Kabina
                     <RangeSlider min={1} max={10} step={1}/>
                     Ležajeva
                     <RangeSlider min={1} max={10} step={1}/>
-                </Accordion>
+                </DropdownDiv>
             </div>
         </div>
 

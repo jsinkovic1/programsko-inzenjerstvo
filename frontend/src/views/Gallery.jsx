@@ -1,6 +1,6 @@
 ﻿import "../App.css"
 import {useNavigate} from "react-router-dom";
-import Accordion from "../components/Accordion.jsx";
+import DropdownDiv from "../components/DropdownDiv.jsx";
 import Slider from "../components/Slider.jsx";
 import RangeSlider from "../components/RangeSlider.jsx";
 import {CardMedium, CardSmall} from "../components/Cards.jsx";
@@ -35,14 +35,14 @@ function Gallery() {
                 </button>
 
                 {/* Accordion element, koristan za filtere */}
-                <Accordion header={"Accordion"}>
+                <DropdownDiv header={"Accordion"}>
                     <button onClick={() => nav("/map")} className={"button fill-primary"}>
                         Lorem ipsum
                     </button>
                     <button onClick={() => nav("/map")} className={"button fill-primary"}>
                         Lorem ipsum
                     </button>
-                </Accordion>
+                </DropdownDiv>
 
                 {/* Text input */}
                 <input type="text" placeholder={"Text input"} className="text-input"/>
