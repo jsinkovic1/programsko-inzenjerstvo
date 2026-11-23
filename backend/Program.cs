@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using System.Data.Common;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -118,7 +119,24 @@ builder.Services.AddAuthentication(opt =>
         {
             context.Token = context.Request.Cookies["ACCESS_TOKEN"];
             return Task.CompletedTask;
-        }
+        },
+        // Provjerava se postoji li korisnik u bazi podataka i je li aktivan
+        OnTokenValidated = async context =>
+        {
+            var userIdClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                context.Fail("Nevažeći token");
+                return;
+            }
+
+            var dbContext = context.HttpContext.RequestServices.GetRequiredService<AppDbContext>();
+            var userExists = await dbContext.Korisnici.AnyAsync(k => k.Idkorisnika == userId && k.Aktivan == true);
+
+            if (!userExists)
+                context.Fail("Korisnik ne postoji ili nije aktivan");
+        } 
     };
 });
 
