@@ -1,13 +1,6 @@
 ﻿@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Roboto:wght@500&display=swap");
 @import "tailwindcss";
-
-@theme {
-    --font-sans: "Inter", system-ui, sans-serif;
-    --font-title: "Roboto", sans-serif;
-
-    --color-mainOrange: #EA9E25;
-    --color-navy: #1f2d55;
-}
+@import "../App.css";
 
 html,
 body,
@@ -18,9 +11,9 @@ body,
 }
 
 .leaflet-popup {
-    top: -15rem !important;
-    left: 50px !important;
+    position: relative !important;
     box-shadow: none !important;
+    bottom: 0px !important;
 }
 
 
@@ -37,11 +30,12 @@ body,
 
 .leaflet-popup-content-wrapper
 {
+    position: absolute !important;
     box-shadow: none !important;
     width: 45rem;
     height: 30rem;
-    text-align: center;
-    align-content: center;
+    left: 24px;
+    top: -15rem
 }
 
 .leaflet-popup-content
@@ -53,6 +47,7 @@ body,
 
 .marker
 {
+    position: absolute;
     width: 32px !important;
     height: 32px !important;
     margin-left: -16px !important;

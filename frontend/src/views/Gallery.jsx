@@ -1,16 +1,17 @@
 ﻿import "../App.css"
 import {useNavigate} from "react-router-dom";
-import Accordion from "../components/Accordion.jsx";
+import DropdownDiv from "../components/DropdownDiv.jsx";
 import Slider from "../components/Slider.jsx";
 import RangeSlider from "../components/RangeSlider.jsx";
 import {CardMedium, CardSmall} from "../components/Cards.jsx";
 import {useEffect, useState} from "react";
 import Vessel from "../models/Vessel.js";
 import {MdInsertEmoticon} from "react-icons/md";
+import Accordion from "../components/Accordion.jsx";
 
 
 function Gallery() {
-    var nav = useNavigate()
+    const nav = useNavigate();
     const [vessel, SetVessel] = useState(null)
 
 
@@ -34,7 +35,16 @@ function Gallery() {
                     Button (accent fill)
                 </button>
 
-                {/* Accordion element, koristan za filtere */}
+                {/* DropdownDiv element, koristan za filtere */}
+                <DropdownDiv header={"DropdownDiv"}>
+                    <button onClick={() => nav("/map")} className={"button fill-primary"}>
+                        Lorem ipsum
+                    </button>
+                    <button onClick={() => nav("/map")} className={"button fill-primary"}>
+                        Lorem ipsum
+                    </button>
+                </DropdownDiv>
+
                 <Accordion header={"Accordion"}>
                     <button onClick={() => nav("/map")} className={"button fill-primary"}>
                         Lorem ipsum
@@ -49,7 +59,7 @@ function Gallery() {
 
                 {/* Slideri */}
                 <Slider min={0} max={100} step={1}/>
-                <RangeSlider min={0} max={100} step={1}/>
+                <RangeSlider min={0} max={10} step={1}/>
 
                 {/* Gumbi s ikonom */}
                 <div className={"flex flex-row gap-2 h-10"}>
@@ -81,6 +91,7 @@ function Gallery() {
             </div>
             <div className={"flex flex-col gap-2"}>
                 <CardSmall vessel={vessel}/>
+                <CardSmall vessel={vessel} viewButton={true}/>
                 <CardMedium/>
             </div>
         </div>

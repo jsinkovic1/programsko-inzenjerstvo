@@ -3,7 +3,7 @@
 
 .card-small
 {
-    @apply h-30 rounded-md bg-gray-100 flex flex-row;
+    @apply h-30 rounded-md bg-gray-100 overflow-clip flex flex-row;
 
     .card-image
     {
@@ -22,7 +22,7 @@
 
     .card-description
     {
-        @apply font-sans text-base text-gray-700 font-bold grid grid-cols-2 grid-rows-3 grid-flow-col h-full pl-1
+        @apply font-sans text-base text-gray-700 font-bold grid grid-cols-2 grid-rows-3 grid-flow-col h-full overflow-hidden pl-1
     }
 }
 

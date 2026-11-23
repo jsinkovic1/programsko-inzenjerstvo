@@ -26,7 +26,7 @@ export default defineConfig({
                             changeOrigin: false,
                             secure: false,
                             //hostRewrite: "https://charterly.site:5201"
-                    },
+                        },
                     '/signin-google': {
                         target: 'https://charterly.site:5201/',
                         changeOrigin: false,
@@ -34,9 +34,9 @@ export default defineConfig({
                     }
                 },
             allowedHosts:
-            [
-                "charterly.site"
-            ]
+                [
+                    "charterly.site"
+                ]
         }
 
 })
