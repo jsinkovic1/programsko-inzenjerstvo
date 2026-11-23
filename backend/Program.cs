@@ -1,16 +1,25 @@
-using System.Data.Common;
 using CharterBackend.Data;
+using CharterBackend.Options;
+using CharterBackend.Services;
+using CharterBackend.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using System.Data.Common;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
@@ -30,24 +39,113 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "Default",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173", "http://localhost:8080", "http://16.192.213.81:8080")
-                .AllowAnyHeader().AllowAnyMethod();
+            policy.WithOrigins("http://localhost:5173", "http://localhost:8080", "https://charterly.site")
+                .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
         });
 });
 
+// Proslijeđena zaglavlja omogućuju ispravno prepoznavanje izvornog protokola i IP adrese iza proxyja
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto |
+        ForwardedHeaders.XForwardedHost;
+});
+
+// Registriraju se pomoć za HTTP kontekst i aplikacijski servisi s dosegom jednog zahtjeva
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAuthTokenProcessor, AuthTokenProcessor>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+
+//definiranje JWT postavki iz konfiguracije
+var jwtOptions = new JwtOptions
+{
+    Issuer = builder.Configuration["Jwt:Issuer"] ?? "CharterBackend",
+    Audience = builder.Configuration["Jwt:Audience"] ?? "CharterFrontend",
+    Secret = builder.Configuration["Jwt:Secret"]
+        ?? throw new InvalidOperationException("Jwt:Secret nije postavljen")
+};
+
+// registrira se JwtOptions kao singleton kako bi bio dostupan kroz cijelu aplikaciju
+builder.Services.AddSingleton(jwtOptions);
+
+// Postavlja se JWT kao zadana shema za autentikaciju i izazivanje prijave
+builder.Services.AddAuthentication(opt =>
+{
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+}).AddCookie().AddGoogle(options =>
+{
+    // Google OAuth podaci učitavaju se iz secretsa
+    var clientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+
+    if (clientId == null)
+    {
+        throw new ArgumentNullException(nameof(clientId));
+    }
+
+    var clientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
+
+    if (clientSecret == null)
+    {
+        throw new ArgumentNullException(nameof(clientSecret));
+    }
+
+    options.ClientId = clientId;
+    options.ClientSecret = clientSecret;
+    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+}).AddJwtBearer(options =>
+{
+    // Za prihvaćanje tokena provjeravaju se izdavatelj, publika, rok trajanja i potpis
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtOptions.Issuer,
+        ValidAudience = jwtOptions.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret))
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        // Token se čita iz ACCESS_TOKEN kolačića
+        OnMessageReceived = context =>
+        {
+            context.Token = context.Request.Cookies["ACCESS_TOKEN"];
+            return Task.CompletedTask;
+        }
+    };
+});
+
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = 307;
+    options.HttpsPort = 5201;
+});
+
+builder.WebHost.UseUrls("https://*:5201/");
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-
 app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseCors("Default");
+
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

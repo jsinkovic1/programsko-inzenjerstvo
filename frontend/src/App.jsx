@@ -6,6 +6,8 @@ import Map from "./views/Map.jsx"
 import Vessel from "./views/Vessel.jsx"
 import Gallery from "./views/Gallery.jsx";
 import Login from "./views/Login.jsx";
+import Privacy from './views/Privacy.jsx';
+import Terms from './views/Terms.jsx';
 
 
 function App() {
@@ -20,6 +22,9 @@ function App() {
                 <Route path="/vessel/:id" element={<Vessel />} />
                 <Route path="/dev/gallery" element={<Gallery />} />
                 <Route path="/login" element={<Login />} />
+                
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms/>} />
             </Routes>
         </BrowserRouter>
     );

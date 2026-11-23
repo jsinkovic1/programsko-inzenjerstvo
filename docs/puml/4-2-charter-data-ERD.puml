@@ -121,7 +121,7 @@ entity "NEDOSTUPNITERMIN" as Nedostupni {
 entity "KORISNIK" as Korisnik {
     * idKorisnika : INT <<PK>>
     --
-    * username : VARCHAR(50) <<UNIQUE>>
+    * googleSubject : VARCHAR(255) <<UNIQUE>>
     * ime : VARCHAR(50)
     * prezime : VARCHAR(50)
     * mail : VARCHAR(100) <<UNIQUE>>

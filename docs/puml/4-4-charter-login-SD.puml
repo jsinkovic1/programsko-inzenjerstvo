@@ -1,0 +1,74 @@
+@startuml
+title Prijava u sustav putem Google računa (UC-001)
+
+skinparam maxMessageSize 170
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+skinparam ArrowColor #212529
+
+skinparam sequence {
+    ParticipantBackgroundColor #E7F1FF
+    ParticipantBorderColor #0D6EFD
+    ActorBackgroundColor #F8F9FA
+    ActorBorderColor #212529
+    LifeLineBorderColor #212529
+}
+
+skinparam note {
+    BackgroundColor #F8F9FA
+    BorderColor #212529
+}
+
+autonumber
+
+' ==============================================================================
+' Sudionici
+' ==============================================================================
+actor "Posjetitelj" as Korisnik
+participant "Web-klijent" as Web <<UI>>
+participant "AuthController" as API <<API>>
+participant "Google\n(OAuth 2.0)" as Google <<External>>
+participant "AccountService" as Account <<Service>>
+database "PostgreSQL" as DB <<Persistence>>
+
+' ==============================================================================
+' Prijava kod Googlea
+' ==============================================================================
+Korisnik -> Web ++ : klikne „Prijava”
+Web -> API : GET /api/auth/login/google
+API --> Web : preusmjeravanje na Google
+Web -> Google ++ : stranica za prijavu
+Korisnik -> Google : prijava Google računom
+Google --> Web -- : povratak u aplikaciju s autorizacijskim kodom
+
+' ==============================================================================
+' Lokalni račun i token
+' ==============================================================================
+Web -> API ++ : povratak s kodom
+API -> Google ++ : zamjena koda za podatke o korisniku
+Google --> API -- : identifikator, e-pošta, ime, prezime
+API -> Account ++ : LoginWithGoogleAsync(korisnik)
+Account -> DB ++ : pronađi korisnika prema Google identifikatoru
+DB --> Account -- : korisnik ili ništa
+
+opt prva prijava
+  Account -> DB ++ : spremi novog korisnika (uloga KORISNIK)
+  DB --> Account -- : novi korisnik
+end
+
+alt račun nije aktivan
+  Account --> API : prijava odbijena
+  API --> Web : pogreška
+else račun je aktivan
+  Account -> Account : izradi JWT s ulogom\n(AuthTokenProcessor, vrijedi 1 h)
+  Account --> API -- : token u kolačiću ACCESS_TOKEN
+  API --> Web -- : povratak na početnu stranicu
+  Web --> Korisnik -- : prikaz prijavljenog korisnika
+end
+
+note over Web, API
+  Uz svaki sljedeći zahtjev preglednik šalje kolačić ACCESS_TOKEN,
+  a poslužitelj iz tokena čita ulogu korisnika.
+end note
+@enduml

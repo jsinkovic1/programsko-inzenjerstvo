@@ -1,4 +1,4 @@
-# [Naziv aplikacije]
+# Charterly
 
 Web-aplikacija za podršku poslovanju charter tvrtke koja iznajmljuje plovila, od pretrage i rezervacije plovila do upravljanja flotom i praćenja poslovanja.
 
@@ -9,74 +9,73 @@ Web-aplikacija za podršku poslovanju charter tvrtke koja iznajmljuje plovila, o
 
 Kada se ponuda, raspoloživost plovila i rezervacije vode u odvojenim evidencijama, teško je imati pregled poslovanja i lako dolazi do dvostrukog rezerviranja. Aplikacija klijentima omogućuje da pronađu slobodno plovilo za željeni termin, vide ukupnu cijenu najma i pošalju zahtjev za rezervaciju, a djelatnicima, voditelju i administratoru tvrtke daje jedno mjesto za upravljanje flotom, rezervacijama i rasporedom preuzimanja i povrata. Aplikacija je u razvoju, pa funkcionalnosti u nastavku čine planirani opseg.
 
-**Ključne funkcionalnosti (planirane)**
+**Ključne funkcionalnosti (planirani opseg)**
 
 - Pretraživanje plovila prema terminu, matičnoj luci, vrsti plovila i kapacitetu, uz prikaz cijene najma za odabrano razdoblje.
 - Detalji plovila s fotografijama, opremom, kalendarom raspoloživosti, položajem matične luke na karti i vremenskom prognozom.
 - Rezervacija plovila s dodatnim uslugama i opremom, uz izračun ukupnog iznosa, sprječavanje preklapanja termina i potvrdu e-poštom.
 - Upravljanje flotom, cijenama, uslugama, nedostupnošću plovila i rezervacijama te raspored preuzimanja i povrata za djelatnike.
 - Statistika poslovanja s izvozom izvještaja u CSV.
-- Prijava putem AAI@EduHr s ulogama klijenta, djelatnika, voditelja i administratora.
+- Prijava putem Google računa s ulogama klijenta, djelatnika, voditelja i administratora.
 
-Za potpuni opseg, zahtjeve, oblikovanje i dokaze ispitivanja pogledajte [docs](docs/Home.md).
+Za potpuni opseg, zahtjeve i oblikovanje pogledajte [docs](docs/Home.md).
 
-<!--
 <a id="deployment"></a>
 ## Postavljanje (engl. deployment)
--->
-<!-- UPUTA: Ovaj odjeljak opisuje već postavljenu aplikaciju koju se  može otvoriti i isprobati bez lokalnog pokretanja izvornog koda.
-Za Iteraciju 1 i Završni pregled navedite konkretne podatke. Provjerite vodi li URL na javno dostupnu pokrenutu aplikaciju i radi li navedeni tijek uporabe. Nikada ne objavljujte lozinke ni pristupne tokene. -->
 
-<!--
-**Javno dostupna aplikacija:** [Javni URL]
+**Javno dostupna aplikacija:** [https://charterly.site](https://charterly.site)
 
-**Isprobajte:** [Jedna ili dvije kratke radnje koje pokazuju funkcionalan korisnički tijek.]
+**Isprobajte:** Na početnoj stranici odaberite „Otvori kartu” i kliknite oznaku luke: prikazuju se plovila s matičnom lukom u toj luci. Na stranici [popisa plovila](https://charterly.site/details) upišite dio naziva plovila (npr. „Morska”) i otvorite detalje plovila.
 
-**Demonstracija:** [Objasnite kako dobiti potreban ograničeni pristup ako je prijava obavezna; u suprotnom napišite „Korisnički račun nije potreban.” Ovdje ne objavljujte lozinke ni pristupne tokene.]
+**Demonstracija:** Za pregled kataloga i karte korisnički račun nije potreban. Za prijavu je potreban Google račun; prijava se pokreće iz izbornika korisnika u zaglavlju, a novi korisnik pri prvoj prijavi dobiva ulogu klijenta.
 
-**Ograničenja:** [Kratko navedite ograničenja postavljene inačice ili postavite poveznicu na jedinstveno mjerodavno mjesto u dokumentaciji s poznatim problemima.]
+**Ograničenja:** Ovo je inačica s polovice projekta. Rezervacije, administracija, raspored, statistika, obavijesti e-poštom i vremenska prognoza još nisu implementirani, a fotografije plovila zasad su zamjenske slike. Poznati tehnički dug i rizici navedeni su u [arhitekturi, odjeljak 4.7](docs/4-Arhitektura-i-oblikovanje.md#47-arhitekturni-rizici-i-tehnički-dug).
 
-[Vodič za postavljanje i pokretanje](docs/6-Postavljanje-instalacija-i-konfiguracija.md) opisuje smještaj aplikacije (engl. hosting) koji tim stvarno koristi. Tim može koristiti Render ili drugu platformu koju ste dogovorili s asistentom/demonstratorom.
--->
+Aplikacija se kao Docker kontejner automatski postavlja na virtualni poslužitelj Amazon EC2 pri svakoj promjeni na grani `main` (GitHub Actions, `.github/workflows/cd.yml`). Postavljanje je opisano u [arhitekturi, odjeljak 4.2](docs/4-Arhitektura-i-oblikovanje.md#42-gradivni-blokovi-i-uml-dijagram-komponenata).
 
-<!--
 <a id="quick-start"></a>
 ## Brzi početak / instalacija
--->
 
-<!-- Obavezno od Demo 1 nadalje. Zamijenite mjesta za unos naredbama koje je drugi član tima uspješno provjerio nakon čistog kloniranja repozitorija. Detaljne upute za administraciju držite u projektnoj dokumentaciji u direktoriju docs/. -->
-
-<!--
-**Preduvjeti:** [Navedite potrebno izvršno okruženje (engl. runtime) i verzija, upravitelj paketa (engl. package manager), baza podataka ili vanjska usluga ako je nužna.]
+**Preduvjeti:** .NET 10 SDK, Node.js (inačica 22 ili novija) s npm-om, Docker (za bazu podataka) te OAuth klijent u Google Cloud konzoli (Client ID i Client Secret) s povratnom adresom `https://localhost:5201/signin-google`.
 
 ```bash
-git clone [repository URL]
-cd [repository directory]
-[install dependencies]
-[run the application]
+git clone https://github.com/jsinkovic1/programsko-inzenjerstvo.git
+cd programsko-inzenjerstvo
+
+# 1. Baza podataka: PostgreSQL 18 sa shemom i testnim podacima iz direktorija db/
+docker build -t charter-db db/
+docker run -d --name charter-db -e POSTGRES_PASSWORD=<lozinka> -p 5432:5432 charter-db
+
+# 2. Poslužiteljska aplikacija (API na https://localhost:5201)
+export HOST_ADDRESS=localhost HOST_PORT=5432 DATABASE_NAME=testdb DATABASE_USER=postgres DATABASE_PASSWORD=<lozinka>
+export GOOGLE_CLIENT_ID=<client-id> GOOGLE_CLIENT_SECRET=<client-secret> Jwt__Secret=<nasumičan niz od najmanje 32 znaka>
+dotnet dev-certs https --trust
+dotnet run --project backend/CharterBackend.csproj
+
+# 3. Web-klijent (u drugom terminalu)
+cd frontend
+npm install
+npm run dev
 ```
 
-**Adresa:** [Stvarna adresa koju aplikacija ispiše nakon pokretanja.]
+**Adresa:** Web-klijent je dostupan na `https://localhost:5173`, a API na `https://localhost:5201`. Razvojni poslužitelj koristi samopotpisani certifikat, pa preglednik pri prvom otvaranju traži potvrdu.
 
-**Konfiguracija:** [Navedite potrebne varijable okruženja (engl. environment variables) ili uputite na sigurnu datoteku `.env.example`; objasnite gdje se dobivaju vrijednosti. Nikada ne stavljajte stvarne pristupne podatke u ovu datoteku, primjer konfiguracije, snimke zaslona, zapise ni zapise promjena (engl. commits).]
+**Konfiguracija:** Poslužiteljska aplikacija čita postavke iz varijabli okruženja: `HOST_ADDRESS`, `HOST_PORT`, `DATABASE_NAME`, `DATABASE_USER` i `DATABASE_PASSWORD` za bazu, `GOOGLE_CLIENT_ID` i `GOOGLE_CLIENT_SECRET` za Google prijavu te `Jwt__Secret` za potpis tokena. Bez postavki za Google prijavu poslužitelj ne može obraditi zahtjeve. Vrijednosti za postavljenu aplikaciju čuvaju se u GitHub Secrets; lokalno ih svaki član postavlja sam i nikad ih ne zapisuje u repozitorij. Web-klijent u razvojnom načinu prosljeđuje zahtjeve na `/api` prema adresi zadanoj u `frontend/vite.config.js` (`server.proxy`); za rad s lokalnim API-jem ta adresa treba biti `https://localhost:5201`.
 
-[Dodajte kratak korak provjere, primjerice koja se stranica treba otvoriti ili koja naredba pokreće osnovnu provjeru.] Za detaljno postavljanje pogledajte [projektnu dokumentaciju](docs/Home.md).
--->
-
-
+Za provjeru otvorite `https://localhost:5173/map`: na karti se prikazuju oznake luka s brojem plovila. Za detaljno postavljanje pogledajte [projektnu dokumentaciju](docs/Home.md).
 
 ## Tehnologije
  
 | Tehnologija ili alat | Uloga u ovom projektu | Razlog uporabe |
 | --- | --- | --- |
-| React (Vite) | Korisničko sučelje: katalog, pretraga, rezervacije te sučelja za djelatnike, voditelja i administratora. | Komponente olakšavaju izradu responzivnog sučelja za računala, tablete i mobitele; Vite omogućuje brz razvoj i izradu produkcijske inačice. |
+| React (Vite, Tailwind CSS) | Korisničko sučelje: katalog, pretraga, karta, rezervacije te sučelja za djelatnike, voditelja i administratora. | Komponente olakšavaju izradu responzivnog sučelja za računala, tablete i mobitele; Vite omogućuje brz razvoj i izradu produkcijske inačice. |
 | C# (ASP.NET Core) | Poslužiteljska strana: poslovna pravila, prijava, slanje e-pošte i pozivi vanjskih servisa. | Zreo okvir za izradu REST API-ja s ugrađenom podrškom za autentifikaciju i autorizaciju; uz Entity Framework Core olakšava rad s bazom. |
 | PostgreSQL | Pohranjuje korisnike, plovila, rezervacije, usluge i termine zauzetosti. | Pouzdana relacijska baza čije ograničenje `EXCLUDE` (proširenje `btree_gist`) sprječava preklapanje rezervacija i pri istodobnim zahtjevima. |
-| AAI@EduHr (OAuth 2.0) | Prijava korisnika. | Zahtjev kolegija: aplikacija ne pohranjuje lozinke, a uloge i specijalnosti djelatnika vodi sama. |
-| [Servis za e-poštu] | Šalje klijentu potvrdu rezervacije i obavijest o otkazivanju ili odbijanju. | [Razlog odabira servisa.] |
-| [Kartografski servis] | Prikazuje položaj matične luke na karti. | Zadatak traži prikaz lokacije luke; [razlog odabira servisa]. |
-| [Meteorološki servis] | Dohvaća vremensku prognozu za matičnu luku i razdoblje najma. | Zadatak traži prikaz prognoze; [razlog odabira servisa]. |
-| [Hosting servis] | Pokreće aplikaciju i bazu tako da su dostupne putem interneta. | [Razlog odabira platforme.] |
+| Google prijava (OAuth 2.0) | Prijava korisnika; poslužitelj nakon prijave izdaje vlastiti JWT u HttpOnly kolačiću. | Zamjena za AAI@EduHr, kojem tim nije pravodobno dobio pristup. Aplikacija ne pohranjuje lozinke, a uloge i specijalnosti djelatnika vodi sama. |
+| Servis za e-poštu (još nije odabran) | Slat će klijentu potvrdu rezervacije i obavijest o otkazivanju. | Servis se odabire prije implementacije obrade rezervacija. |
+| Thunderforest (uz biblioteku Leaflet) | Kartografske pločice za kartu s položajem matičnih luka i plovilima u svakoj luci. | Zadatak traži prikaz lokacije luke; Leaflet omogućuje interaktivnu kartu u pregledniku bez opterećenja poslužitelja. |
+| Meteorološki servis (još nije odabran) | Dohvaćat će vremensku prognozu za matičnu luku i razdoblje najma. | Zadatak traži prikaz prognoze; servis se odabire u drugoj polovici projekta. |
+| AWS EC2, Docker i GitHub Actions | Pokreću aplikaciju na adresi charterly.site; svaka promjena na grani `main` automatski se izgrađuje i postavlja. | Potpuna kontrola nad poslužiteljem i domenom (Google prijava zahtijeva HTTPS i domenu); isti postupak postavljanja pri svakoj promjeni. |
 
 <a id="team-members"></a>
 ## Članovi tima
@@ -101,7 +100,7 @@ Izravni `push` na granu `main` nije dopušten. Sve promjene izrađuju se na zase
 <a id="license"></a>
 ## Licenca
  
-**Status licence:** Projekt je licenciran licencom [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). Puni tekst nalazi se u datoteci [LICENCE](LICENCE).
+**Status licence:** Projekt je licenciran licencom [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). Puni tekst nalazi se u datoteci [LICENSE](LICENSE).
  
 
 <a id="ai-usage"></a>
@@ -109,9 +108,9 @@ Izravni `push` na granu `main` nije dopušten. Sve promjene izrađuju se na zase
 
 Ovaj projekt slijedi FER-ova [pravila o primjerenoj uporabi umjetne inteligencije](https://www.fer.unizg.hr/_download/repository/Policy%20on%20the%20appropriate%20use%20of%20artificial%20intelligence%20at%20the%20faculty%20of%20electrical%20engineering%20and%20computing%5B1%5D.pdf).
 
-**Izjava:** [Navedite jesu li korišteni alati umjetne inteligencije. Ako jesu, navedite alate i njihove glavne namjene te objasnite kako je tim pregledao nastali kod ili tekst i kako može objasniti vlastiti doprinos. Ako nisu korišteni, to jasno navedite. U alate umjetne inteligencije nemojte unositi privatne podatke, pristupne podatke ni tuđe zaštićene materijale.]
+**Izjava:** Tim je koristio alate generativne umjetne inteligencije (Claude, ChatGPT) u ograničenoj mjeri. Kod aplikacije (web-klijent, poslužiteljska aplikacija i baza podataka) pisali su članovi tima, a alate su koristili ponajprije za objašnjenje novih koncepata (npr. OAuth 2.0 i JWT, Entity Framework Core, React). U dokumentaciji su alati pomogli pri provjeri dosljednosti poglavlja, preoblikovanju teksta i nacrtima PlantUML dijagrama. Tim je svaki prihvaćeni prijedlog provjerio prema kodu i zahtjevima i može objasniti sav objavljeni sadržaj. U alate nisu unošeni pristupni podaci ni osobni podaci.
 
-[Ako je za ovaj projekt potreban detaljniji zapis uporabe umjetne inteligencije, postavite poveznicu na njegovo jedinstveno mjerodavno mjesto u dokumentaciji.]
+Detaljan zapis uporabe nalazi se u [projektnoj dokumentaciji](docs/Home.md#izjava-o-uporabi-umjetne-inteligencije).
 
 <a id="code-of-conduct-and-support"></a>
 ## Kodeks ponašanja i podrška [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)

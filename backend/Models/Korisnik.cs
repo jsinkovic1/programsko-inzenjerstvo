@@ -7,7 +7,7 @@ public partial class Korisnik
 {
     public int Idkorisnika { get; set; }
 
-    public string Username { get; set; } = null!;
+    public string GoogleSubject { get; set; } = null!;
 
     public string Ime { get; set; } = null!;
 

@@ -45,7 +45,7 @@ Web --> Klijent : prikaži specifikaciju i ukupni iznos
 ' Faza 2: slanje zahtjeva, provjera i pohrana
 ' ==============================================================================
 Klijent -> Web : potvrdi slanje zahtjeva
-Web -> API ++ : POST /api/rezervacija (sesijski kolačić)
+Web -> API ++ : POST /api/rezervacija (kolačić ACCESS_TOKEN)
 
 alt korisnik nije prijavljen ili nema ulogu klijenta
   API --> Web : 401 Unauthorized / 403 Forbidden
@@ -54,7 +54,7 @@ alt korisnik nije prijavljen ili nema ulogu klijenta
 else klijent je autoriziran
   API -> Service ++ : IzradiZahtjev(idKlijenta, zahtjev)
 
-  alt neispravan unos (povrat <= preuzimanje, preuzimanje u prošlosti,\nbroj osoba > kapacitet, neaktivno plovilo)
+  alt neispravan unos (povrat <= preuzimanje, preuzimanje u prošlosti,\nbroj osoba > kapacitet)
     Service --> API : ValidacijskaIznimka
     API --> Web : 400 Bad Request (poruke po poljima)
     Web --> Klijent : označi neispravna polja

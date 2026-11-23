@@ -1,5 +1,5 @@
 @startuml
-title Sustav za charter poslovanje – komponente
+title Charterly – komponente sustava
 
 skinparam shadowing false
 skinparam defaultFontName Arial
@@ -13,6 +13,18 @@ skinparam component {
     BorderColor #0D6EFD
 }
 
+skinparam component<<planirano>> {
+    BackgroundColor #F8F9FA
+    BorderColor #6C757D
+    BorderStyle dashed
+    FontColor #495057
+}
+
+skinparam component<<vanjski>> {
+    BackgroundColor #FFFDE0
+    BorderColor #A09060
+}
+
 skinparam database {
     BackgroundColor #FFF3CD
     BorderColor #212529
@@ -22,22 +34,22 @@ skinparam database {
 ' Granica sustava i unutarnje komponente
 ' ==============================================================================
 
-rectangle "Sustav za charter poslovanje" {
+rectangle "Charterly – sustav za charter poslovanje" {
 
   component "Web-klijent\n(React SPA)" as Web
 
   rectangle "Poslužiteljska aplikacija (ASP.NET Core Web API)" {
     component "REST API\n(kontroleri)" as API
-    component "Autentifikacija\ni autorizacija" as Auth
+    component "Autentifikacija\n(Google prijava, JWT)" as Auth
     component "Katalog i pretraga\nplovila" as Katalog
-    component "Rezervacije\n(izračun iznosa, statusi)" as Rez
-    component "Upravljanje flotom\ni cjenikom" as Flota
-    component "Korisnici\ni uloge" as Korisnici
-    component "Raspored\npreuzimanja i povrata" as Raspored
-    component "Statistika\ni izvoz CSV" as Stat
-    component "Obavijesti\n(e-pošta)" as Obavijesti
-    component "Vremenska\nprognoza" as Prognoza
-    component "Završetak najma\n(pozadinski posao)" as Zavrsetak
+    component "Rezervacije\n(izračun iznosa, statusi)" as Rez <<planirano>>
+    component "Upravljanje flotom\ni cjenikom" as Flota <<planirano>>
+    component "Korisnici\ni uloge" as Korisnici <<planirano>>
+    component "Raspored\npreuzimanja i povrata" as Raspored <<planirano>>
+    component "Statistika\ni izvoz CSV" as Stat <<planirano>>
+    component "Obavijesti\n(e-pošta)" as Obavijesti <<planirano>>
+    component "Vremenska\nprognoza" as Prognoza <<planirano>>
+    component "Završetak najma\n(pozadinski posao)" as Zavrsetak <<planirano>>
     component "Pristup podacima\n(EF Core, AppDbContext)" as Data
   }
 
@@ -48,21 +60,21 @@ rectangle "Sustav za charter poslovanje" {
 ' Vanjski sustavi
 ' ==============================================================================
 
-component "AAI@EduHr\n(vanjski, OAuth 2.0)" as AAI
-component "Servis za e-poštu\n(vanjski)" as Mail
-component "Meteorološki servis\n(vanjski)" as Meteo
-component "Kartografski servis\n(vanjski)" as Maps
+component "Google\n(OAuth 2.0)" as Google <<vanjski>>
+component "Thunderforest\n(kartografske pločice)" as Maps <<vanjski>>
+component "Servis za e-poštu\n(još nije odabran)" as Mail <<vanjski>>
+component "Meteorološki servis\n(još nije odabran)" as Meteo <<vanjski>>
 
 ' ==============================================================================
 ' Ovisnosti i sučelja
 ' ==============================================================================
 
-Web --> API : HTTPS, JSON (REST)
-Web --> Maps : kartografske pločice\ni oznaka luke
-Web ..> AAI : preusmjeravanje\nna prijavu
+Web --> API : HTTPS, JSON (REST),\nkolačić ACCESS_TOKEN
+Web --> Maps : kartografske pločice\n(Leaflet)
+Web ..> Google : preusmjeravanje\nna prijavu
 
-API --> Auth : identitet i uloga\nkorisnika
-API --> Katalog : pretraga, detalji,\nkalendar zauzetosti
+API --> Auth : prijava, identitet\ni uloga korisnika
+API --> Katalog : plovila, luke,\nfiltar i pretraga
 API --> Rez : izrada, izmjena,\npotvrda, otkazivanje
 API --> Flota : plovila, luke, usluge,\noprema, nedostupnost
 API --> Korisnici : uloge, specijalnosti,\naktivnost računa
@@ -70,11 +82,11 @@ API --> Raspored : potvrđene rezervacije\nza razdoblje
 API --> Stat : pokazatelji\ni CSV datoteka
 API --> Prognoza : prognoza za luku\ni razdoblje
 
-Auth --> AAI : autorizacijski kod,\nidentitet korisnika
-Auth --> Korisnici : stvaranje računa\npri prvoj prijavi
+Auth --> Google : autorizacijski kod,\nidentitet korisnika
+Auth --> Data : pronalazak ili stvaranje\nračuna pri prvoj prijavi
 
 Rez --> Obavijesti : promjena statusa\n(nakon pohrane)
-Obavijesti --> Mail : potvrda, otkazivanje,\nodbijanje
+Obavijesti --> Mail : potvrda i\notkazivanje
 Prognoza --> Meteo : koordinate luke,\nrazdoblje
 
 Katalog --> Data
@@ -87,4 +99,10 @@ Obavijesti --> Data : ishod slanja
 Zavrsetak --> Data : POTVRDENA → ZAVRSENA\nza istekle najmove
 
 Data --> DB : SQL (Npgsql)
+
+legend right
+  Plava komponenta: implementirano (stanje sredinom projekta)
+  Siva iscrtkana komponenta: planirano
+  Žuta komponenta: vanjski servis
+endlegend
 @enduml

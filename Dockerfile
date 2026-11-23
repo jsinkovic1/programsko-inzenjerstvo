@@ -1,8 +1,16 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:10.0
+﻿FROM mcr.microsoft.com/dotnet/sdk:10.0-noble
 ADD . /root
 USER root
 WORKDIR /root
-RUN dotnet build /root/backend/CharterBackend.csproj
+RUN mkdir /root/.aspnet
+RUN mkdir /root/.aspnet/https
+RUN mkdir /root/.aspnet/dev-certs
+RUN mkdir /root/.aspnet/dev-certs/trust
+RUN dotnet restore /root/backend/CharterBackend.csproj
+RUN dotnet build --no-restore /root/backend/CharterBackend.csproj
+RUN dotnet dev-certs https -ep /root/.aspnet/https/aspnetapp.pfx -p temptemptemp
+ENV SSL_CERT_DIR="/root/.aspnet/dev-certs/trust"
+RUN dotnet dev-certs https --trust
 RUN apt-get -y update \
     && apt-get install -y curl \
     && curl -sL https://deb.nodesource.com/setup_26.x | bash - \

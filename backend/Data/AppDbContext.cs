@@ -73,7 +73,7 @@ public partial class AppDbContext : DbContext
 
             entity.HasIndex(e => e.Mail, "korisnik_mail_key").IsUnique();
 
-            entity.HasIndex(e => e.Username, "korisnik_username_key").IsUnique();
+            entity.HasIndex(e => e.GoogleSubject, "korisnik_google_subject_key").IsUnique();
 
             entity.Property(e => e.Idkorisnika)
                 .UseIdentityAlwaysColumn()
@@ -91,9 +91,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Uloga)
                 .HasMaxLength(20)
                 .HasColumnName("uloga");
-            entity.Property(e => e.Username)
-                .HasMaxLength(50)
-                .HasColumnName("username");
+            entity.Property(e => e.GoogleSubject)
+                .HasMaxLength(255)
+                .HasColumnName("googlesubject");
         });
 
         modelBuilder.Entity<Luka>(entity =>
