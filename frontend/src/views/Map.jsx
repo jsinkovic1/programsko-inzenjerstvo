@@ -11,43 +11,29 @@ import RangeSlider from "../components/RangeSlider.jsx";
 import Accordion from "../components/Accordion.jsx";
 
 
-function VesselCard(vessel)
-{
-    return(
-        <li>
-            <div className={"h-40 bg-gray-100 m-1 rounded-lg flex flex-row overflow-hidden"}>
-                <img src={placeholder} alt="placeholder" className={"h-full aspect-square"}>
-                </img>
-
-                <div className={"grow flex flex-col text-left m-1"}>
-                    <div className={"font-title basis-10"}>{vessel["nazivplovila"]}</div>
-                    <div className={"font-sans basis-15"}>
-                        Kapacitet: {vessel["kapacitet"]}<br/>
-                        Kabina: {vessel["brojkabina"]}<br/>
-                        Ležajeva: {vessel["brojlezajeva"]}
-                    </div>
-                </div>
-            </div>
-
-        </li>)
-}
-function HarborMarker({ position, name, id }) {
+function HarborMarker({ position, name, id, filter}) {
     const [vesselCards, SetVesselCards] = useState("")
 
     useEffect(() => {
        fetch("/api/filter", {
             method: "POST",
-            body: JSON.stringify({ harborIds: [id] }),
+            body: JSON.stringify({
+                ...filter,
+                harborIds: [id] 
+            }),
             headers: {
                 "Content-type": "application/json; charset=UTF-8"
             }
-        }).then(x => x.json()).then(json => SetVesselCards(json.map(x => VesselCard(x))))
-    }, [id]);
+        }).then(x => x.json()).then(json => SetVesselCards(json.map(x => (<CardSmall vessel={new Vessel(x)} viewButton={true}/>))))
+    }, [filter, id]);
     const eventHandlers = useMemo(() => ({
         async popupopen() {
             const response = await fetch("/api/filter", {
                 method: "POST",
-                body: JSON.stringify({ harborIds: [id] }),
+                body: JSON.stringify({
+                    ...filter,
+                    HarborIds: [id] 
+                }),
                 headers: {
                     "Content-type": "application/json; charset=UTF-8"
                 }
@@ -56,9 +42,9 @@ function HarborMarker({ position, name, id }) {
             console.log(json)
             SetVesselCards(json.map(x => (<CardSmall vessel={new Vessel(x)} viewButton={true}/>)))
         }
-    }), [id])
+    }), [filter, id])
 
-    const divIcon = new DivIcon({className: "marker", html: vesselCards.length})
+    const divIcon = new DivIcon({className: vesselCards.length > 0 ? "marker" : "marker-disabled", html: vesselCards.length})
     return (
         <Marker eventHandlers={eventHandlers} position={position} icon={divIcon} bind>
             <Popup closeButton={false}>
@@ -74,7 +60,18 @@ function HarborMarker({ position, name, id }) {
 }
 
 function Map() {
+    const [filter, setFilter] = useState({
+        VesselName: "",
+        CapacityLower: null,
+        CapacityHigher: null,
+        CabinNumberLower: null,
+        CabinNumberHigher: null,
+        BedNumberLower: null,
+        BedNumberHigher: null
+    })
     const [pins, setPins] = useState(null)
+    
+    console.log(filter)
 
     useEffect(() => {
         fetch("/api/luka").then(response => response.json()).then(data => {
@@ -83,11 +80,10 @@ function Map() {
     }, [])
 
     try {
-        var markers = pins.map(pin => <HarborMarker position={[parseFloat(pin["latituda"]), parseFloat(pin["longituda"])]} name={pin["nazivluke"]} id={pin["idluke"]}/>)
+        var markers = pins.map(pin => <HarborMarker position={[parseFloat(pin["latituda"]), parseFloat(pin["longituda"])]} name={pin["nazivluke"]} id={pin["idluke"]} filter={filter}/>)
     } catch {
         markers = ""
     }
-
 
     const position = [44.08714036163615, 15.150380435125484]
 
@@ -103,14 +99,49 @@ function Map() {
             </MapContainer>
 
             <div className={"w-70 absolute z-1000 top-16 flex flex-col gap-2 p-2"}>
-                <input type="text" placeholder={"Naziv plovila"} className="text-input"/>
+                <input type="text" onChange={(e) => setFilter(
+                {
+                        ...filter,
+                        VesselName: e.target.value.length > 0 ? e.target.value : null
+                    }
+                )} placeholder={"Naziv plovila"} className="text-input"/>
                 <Accordion header={"Filter"}>
                     Kapacitet
-                    <RangeSlider min={1} max={10} step={1}/>
+                    <RangeSlider onChange={(min, max) => {
+                        let newFilter = {
+                            ...filter,
+                            CapacityLower: min,
+                            CapacityHigher: max
+                        };
+                        setFilter(newFilter)
+                    }} min={1} max={10} step={1}/>
                     Kabina
-                    <RangeSlider min={1} max={10} step={1}/>
+                    <RangeSlider onChange={(min, max) => {
+                        let newFilter = {
+                            ...filter,
+                            CabinNumberLower: min,
+                            CabinNumberHigher: max
+                        };
+                        setFilter(newFilter)
+                    }} min={1} max={10} step={1}/>
                     Ležajeva
-                    <RangeSlider min={1} max={10} step={1}/>
+                    <RangeSlider onChange={(min, max) => {
+                        let newFilter = {
+                            ...filter,
+                            BedNumberLower: min,
+                            BedNumberHigher: max
+                        };
+                        setFilter(newFilter)
+                    }} min={1} max={10} step={1}/>
+                    <button className={"button"} onClick={() => setFilter({
+                        VesselName: "",
+                        CapacityLower: null,
+                        CapacityHigher: null,
+                        CabinNumberLower: null,
+                        CabinNumberHigher: null,
+                        BedNumberLower: null,
+                        BedNumberHigher: null
+                    })}>Reset</button>
                 </Accordion>
             </div>
         </div>

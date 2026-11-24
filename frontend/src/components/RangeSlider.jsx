@@ -2,6 +2,7 @@
 import "./RangeSlider.css"
 
 class RangeSlider extends Component {
+    
     state = {
         valueLow: 0.0,
         valueHigh: 0.0,
@@ -9,9 +10,11 @@ class RangeSlider extends Component {
 
     handleChangeLow = (e) => {
         this.setState({valueLow: e.target.value, valueHigh: this.state.valueHigh});
+        this.props.onChange(Math.min(e.target.value, this.state.valueHigh), Math.max(e.target.value, this.state.valueHigh))
     }
     handleChangeHigh = (e) => {
         this.setState({valueLow: this.state.valueLow, valueHigh: e.target.value});
+        this.props.onChange(Math.min(this.state.valueLow, e.target.value), Math.max(this.state.valueLow, e.target.value))
     }
 
     render() {
