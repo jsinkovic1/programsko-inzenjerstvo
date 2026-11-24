@@ -32,7 +32,7 @@ namespace CharterBackend.Services
             // U token se spremaju identitet, adresa e-pošte i uloga korisnika
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, korisnik.GoogleSubject.ToString()),
+                new Claim("google_sub", korisnik.GoogleSubject.ToString()),
                 new Claim(ClaimTypes.NameIdentifier, korisnik.Idkorisnika.ToString()),
                 new Claim(ClaimTypes.Email, korisnik.Mail),
                 new Claim(ClaimTypes.Role, korisnik.Uloga)
