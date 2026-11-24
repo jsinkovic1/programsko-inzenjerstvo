@@ -1,4 +1,4 @@
-﻿import {Component, use, useEffect, useState} from "react";
+﻿﻿import {Component, use, useEffect, useState} from "react";
 import {FaUserCircle} from "react-icons/fa";
 import {data} from "react-router-dom";
 
@@ -28,13 +28,19 @@ const Header = () => {
             Prijava
         </a>
     )
-    console.log(userData=="");
     if (userData != "")
     {
         dropdown_elements = (
+            <>
             <a href={"/profile"}>
                 {userData["mail"]}
             </a>
+            <form method="POST" action={"/api/auth/logout"}>
+                <button type="submit">
+                    Odjava
+                </button>
+            </form>
+            </>
         )
     }
 
