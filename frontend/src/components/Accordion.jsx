@@ -17,8 +17,8 @@ class Accordion extends Component {
 
     render() {
         return (
-            <div onClick={this.handleClick} className={this.state.collapsed ? "accordion-collapsed flex flex-col" : "accordion-expanded flex flex-col"}>
-                <div className={"accordion-header"}>
+            <div className={this.state.collapsed ? "accordion-collapsed flex flex-col" : "accordion-expanded flex flex-col"}>
+                <div onClick={this.handleClick} className={"accordion-header"}>
                     {this.state.collapsed ? <FaPlus className={"mr-1"} /> : <FaMinus className={"mr-1"}/>}
                     {this.props.header}
                 </div>

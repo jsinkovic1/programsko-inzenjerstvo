@@ -5,9 +5,10 @@ import {useEffect, useMemo, useState} from "react";
 import "./Map.css"
 import {DivIcon} from "leaflet/src/layer/index.js";
 import placeholder from "../assets/placeholder.svg"
-import Accordion from "../components/Accordion.jsx";
+import DropdownDiv from "../components/DropdownDiv.jsx";
 import {CardSmall} from "../components/Cards.jsx";
 import Vessel from "../models/Vessel.js";
+import RangeSlider from "../components/RangeSlider.jsx";
 
 
 function VesselCard(vessel)
@@ -30,43 +31,43 @@ function VesselCard(vessel)
 
         </li>)
 }
-function HarborMarker({ position, name }) {
+function HarborMarker({ position, name, id }) {
     const [vesselCards, SetVesselCards] = useState("")
 
     useEffect(() => {
        fetch("/api/filter", {
             method: "POST",
-            body: JSON.stringify({ harborName: name }),
+            body: JSON.stringify({ harborIds: [id] }),
             headers: {
                 "Content-type": "application/json; charset=UTF-8"
             }
         }).then(x => x.json()).then(json => SetVesselCards(json.map(x => VesselCard(x))))
-    }, [name]);
+    }, [id]);
     const eventHandlers = useMemo(() => ({
         async popupopen() {
             const response = await fetch("/api/filter", {
                 method: "POST",
-                body: JSON.stringify({ harborName: name }),
+                body: JSON.stringify({ harborIds: [id] }),
                 headers: {
                     "Content-type": "application/json; charset=UTF-8"
                 }
             })
             const json = await response.json()
             console.log(json)
-            SetVesselCards(json.map(x => (<CardSmall vessel={new Vessel(x)}/>)))
+            SetVesselCards(json.map(x => (<CardSmall vessel={new Vessel(x)} viewButton={true}/>)))
         }
-    }), [name])
+    }), [id])
 
     const divIcon = new DivIcon({className: "marker", html: vesselCards.length})
     return (
-        <Marker eventHandlers={eventHandlers} position={position} icon={divIcon}>
+        <Marker eventHandlers={eventHandlers} position={position} icon={divIcon} bind>
             <Popup closeButton={false}>
-                <div className={"absolute -top-8 w-auto h-16 -z-1 bg-white rounded-xl text-2xl pl-1 pr-1"}>
-                    {name}
-                </div>
-                <ul className={"flex flex-col overflow-y-scroll rounded-xl"}>
+                <div className={"flex flex-col h-full p-2 gap-2 overflow-y-scroll"}>
+                    <div className={"font-title text-lg border-b-1 border-b-gray-300 rounded-md text-center"}>
+                        {name}
+                    </div>
                     {vesselCards}
-                </ul>
+                </div>
 
             </Popup>
         </Marker>)
@@ -82,7 +83,7 @@ function Map() {
     }, [])
 
     try {
-        var markers = pins.map(pin => <HarborMarker position={[parseFloat(pin["latituda"]), parseFloat(pin["longituda"])]} name={pin["nazivluke"]}/>)
+        var markers = pins.map(pin => <HarborMarker position={[parseFloat(pin["latituda"]), parseFloat(pin["longituda"])]} name={pin["nazivluke"]} id={pin["idluke"]}/>)
     } catch {
         markers = ""
     }
@@ -94,21 +95,24 @@ function Map() {
         <div className={"h-full flex flex-col"}>
             <Header/>
             <MapContainer id="map" className={"h-full"} center={position} zoom={13} scrollWheelZoom={true} zoomControl={false}>
-                <div className={"w-70 absolute z-1000 flex flex-col gap-2 p-2"}>
-                    <input type="text" placeholder={"Naziv plovila"} className="text-input"/>
-                    <Accordion header={"Filter"}>
-                        <p>test test</p>
-                        <p>test test</p>
-                        <p>test test</p>
-                        <p>test test</p>
-                    </Accordion>
-                </div>
                 <TileLayer
                     attribution='&copy; <a href="https://www.thunderforest.com/" target="_blank">Thunderforest</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://api.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=100a2a4b0a6a4f76846b12b31fc115ff"
                 />
                 {markers}
             </MapContainer>
+
+            <div className={"w-70 absolute z-1000 top-16 flex flex-col gap-2 p-2"}>
+                <input type="text" placeholder={"Naziv plovila"} className="text-input"/>
+                <DropdownDiv header={"Filter"}>
+                    Kapacitet
+                    <RangeSlider min={1} max={10} step={1}/>
+                    Kabina
+                    <RangeSlider min={1} max={10} step={1}/>
+                    Ležajeva
+                    <RangeSlider min={1} max={10} step={1}/>
+                </DropdownDiv>
+            </div>
         </div>
 
     </>)

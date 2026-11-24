@@ -4,6 +4,8 @@ import {useEffect, useState} from "react";
 import placeholder from "../assets/placeholder.svg";
 import { useNavigate } from 'react-router-dom';
 import Search from "./Search"
+import DropdownDiv from "../components/DropdownDiv.jsx";
+import RangeSlider from "../components/RangeSlider.jsx";
 
 function Details()
 {
@@ -11,14 +13,55 @@ function Details()
     const navigate=useNavigate()
 
     const[search, setSearch] = useState("")
+    const [priceLower, setPriceLower] = useState("")
+    const [priceHigher, setPriceHigher] = useState("")
 
-    useEffect(() => {
-        fetch("/api/plovilo").then(response => response.json()).then(data => {
+    const fetchAll = () => {
+        fetch("/api/plovilo")
+        .then(response => response.json())
+        .then(data => {
             setBoats(data)
         })
-    }, [])
+    };
 
-    var dani = 2
+    useEffect(() => {
+        fetchAll();
+    }, [])
+    
+    const handlePriceFilter = async(e) => {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const priceLower = formData.get('priceLower');
+        const priceHigher = formData.get('priceHigher');
+
+        try {
+            const response = await fetch("/api/Filter", {
+                method:"POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    priceLower: priceLower ? parseFloat(priceLower) : null,
+                    priceHigher: priceHigher ? parseFloat(priceHigher) : null
+                })
+            })
+            
+            if (response.ok) {
+                const data = await response.json();
+                setBoats(data)
+            }
+        }
+        catch(error) {
+            console.error("Greška: ", error);
+        }
+    }
+
+    const handleReset = () => {
+        setPriceLower("");
+        setPriceHigher("");
+        fetchAll();
+    };
 
     const boatDisplay = boats.filter((boat) => boat.nazivplovila.toLowerCase().includes(search.toLowerCase()))
     console.log(boatDisplay) 
@@ -56,7 +99,7 @@ function Details()
                             (ime luke)
                         </h1>
                         <div className="text-lg text-amber-500 font-bold my-1 gap-1">
-                            {boat["dnevnacijenanajma"] * dani} €
+                            {boat["dnevnacijenanajma"]} €
                         </div>
                     </div>
                     <button 
@@ -75,8 +118,41 @@ function Details()
     return (<>
     <Header/>
         <div className = "flex flex-col items-center gap-4 min-h-screen bg-white font-sans text-black">
-            <div className="w-3/4 mt-4">
+            <div className="w-3/4 mt-4 flex flex-row gap-4">
                 <Search search = {search} setSearch = {setSearch}/>
+                <div className="relative">
+                    
+                </div>
+                <DropdownDiv header={"Cijena"}>
+                    <form onSubmit={handlePriceFilter}>
+                         <div className = "flex flex-row">
+                            <div className = "flex flex-col text-sm text-gray-700 gap-2 font-semibold">
+                                <label>Najniža cijena</label>
+                                <input 
+                                type="number"
+                                name="priceLower" 
+                                className="bg-white rounded-md py-2 px-3 w-36 mr-2 mt-2"
+
+                                />
+                            </div>
+                            <div className = "flex flex-col text-sm text-gray-700 gap-2 font-semibold">
+                                <label>Najviša cijena</label>
+                                <input name="priceHigher" 
+                                type ="number"
+                                className="bg-white rounded-md py-2 px-3 w-36 mr-2 mt-2"/>
+                            </div>
+                        </div>
+                        <RangeSlider min={0} max={10} step={1}/>
+                        <div className = "flex flex-row justify-evenly">
+                            <button type="submit" className="button fill-primary">
+                                Pretraži
+                            </button>
+                            <button type = "button" onClick={handleReset} className="button">
+                                Poništi
+                            </button>
+                        </div>
+                    </form>
+                </DropdownDiv>
             </div>
             {cards}
         </div>

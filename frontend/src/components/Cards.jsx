@@ -11,9 +11,9 @@ class CardSmall extends Component {
             <div className={"card-small"}>
                 <img alt={"vessel image"} className={"card-image"} src={"https://picsum.photos/200"}/>
                 <div className={"card-content-wrapper"}>
-                    <p className={"card-header"}>
+                    <div className={"card-header"}>
                         {vessel ? vessel.name : null}
-                    </p>
+                    </div>
                     <div className={"card-description"}>
                         <div className={"flex flex-row items-center"}>
                             <FaPeopleGroup className={"mt-0.5"}/>
@@ -35,6 +35,11 @@ class CardSmall extends Component {
                             <FaClock className={"mt-0.5"}/>
                             <span className={"pl-1 overflow-hidden"}>{vessel ? vessel.yearofproduction : null}</span>
                         </div>
+
+                        {this.props.viewButton ? (
+                            <a href={"/vessel/" + (vessel ? vessel.id : "")} className={"button fill-accent"}>
+                                Pregledaj
+                            </a>) : ""}
                     </div>
                 </div>
             </div>)
@@ -50,9 +55,9 @@ class CardMedium extends Component {
             <div className={"card-medium"}>
                 <img alt={"vessel image"} className={"card-image"} src={"https://picsum.photos/200/400"}/>
                 <div className={"card-content-wrapper"}>
-                    <p className={"card-header"}>
+                    <div className={"card-header"}>
                         Ime broda
-                    </p>
+                    </div>
                     <div className={"card-description"}>
                         <div className={"flex flex-row items-center"}>
                             <FaPeopleGroup className={"mt-0.5"}/>

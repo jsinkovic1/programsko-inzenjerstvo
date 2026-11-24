@@ -16,26 +16,45 @@ function Logo() {
 }
 
 class Header extends Component {
+    
+    populate_dropdown() {
+        var res = null
+        fetch("/api/auth/me").then(x => x.json()).then(x => {res = x})
+        if (res == null)
+        {
+            return (
+                <a href={"/login"}>
+                    Prijava
+                </a>
+            )
+        }
+        else
+        {
+            return (
+                <a href={"/user"}>
+                    {res["mail"]}
+                </a>
+            )
+        }
+        
+
+    }
+    
     render() {
         return ( 
-      <header className="relative flex h-16 items-center justify-between bg-linear-to-r from-blue-950 to-blue-500 px-2.5 shadow-md">
+      <header className="relative flex h-16 items-center justify-between bg-blue-900 px-2.5 shadow-md">
         <a href="/" className="flex" aria-label="Charter home">
           <Logo />
         </a>
 
         <h1 className="absolute left-1/2 -translate-x-1/2 font-title text-2xl font-medium text-white">
-          Charter
+          Charterly
         </h1>
 
-        <button className={"button icon-button fill-primary dropdown h-10"}>
+        <button className={"button icon-button fill-primary dropdown h-10 z-9999"}>
             <FaUserCircle></FaUserCircle>
             <div className={"dropdown-content right-0"}>
-                <a href={"/login"}>
-                    Prijava
-                </a>
-                <a href={"/signup"}>
-                    Registracija
-                </a>
+                {this.populate_dropdown()}
             </div>
         </button>
       </header>
