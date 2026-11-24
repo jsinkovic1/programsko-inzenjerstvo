@@ -20,7 +20,7 @@ class Header extends Component {
     populate_dropdown() {
         var res = null
         fetch("/api/auth/me").then(x => x.json()).then(x => {res = x})
-        if (res == null)
+        if (res == null || res =="")
         {
             return (
                 <a href={"/login"}>
