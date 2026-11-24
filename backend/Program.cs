@@ -94,6 +94,13 @@ builder.Services.AddAuthentication(opt =>
         throw new ArgumentNullException(nameof(clientSecret));
     }
 
+    // Dodaje se parametar "prompt=select_account" kako bi se korisniku omogućilo odabiranje računa prilikom prijave
+    options.Events.OnRedirectToAuthorizationEndpoint = ctx =>
+    {
+        ctx.Response.Redirect(ctx.RedirectUri + "&prompt=select_account");
+        return Task.CompletedTask;
+    };
+
     options.ClientId = clientId;
     options.ClientSecret = clientSecret;
     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
