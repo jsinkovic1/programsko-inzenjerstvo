@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-﻿﻿import {Component, use, useEffect, useState} from "react";
-=======
-﻿import {Component, use, useEffect, useState} from "react";
->>>>>>> origin/main
+import {Component, use, useEffect, useState} from "react";
 import {FaUserCircle} from "react-icons/fa";
 import {data} from "react-router-dom";
 
@@ -26,7 +22,6 @@ const Header = () => {
     useEffect(() => {
         fetch("api/auth/me").then(res => res.json()).then(data => setUserData(data))
     }, []);
-<<<<<<< HEAD
 
     const handleLogout = async () =>{
         const response = await fetch("/api/auth/logout", {
@@ -36,7 +31,7 @@ const Header = () => {
             },
             credentials: "include"
         })
-        if(response.ok) setUserData("");
+        if (response.ok) setUserData("");
     }
     
     var dropdown_elements = (
@@ -48,34 +43,16 @@ const Header = () => {
     if (userData != "")
     {
         dropdown_elements = (
-            <><a href={"/profile"}>
+            <>
+              <a href={"/profile"}>
                 {userData["mail"]}
-            </a>
-            <button onClick={handleLogout} className="cursor-pointer">
-                Odjava
-            </button></>
+              </a>
+              <button onClick={handleLogout} className="cursor-pointer">
+                  Odjava
+              </button>
+            </>
         )
     }
-
-    
-
-=======
-    
-    var dropdown_elements = (
-        <a href={"/login"}>
-            Prijava
-        </a>
-    )
-    if (userData != null)
-    {
-        dropdown_elements = (
-            <a href={"/profile"}>
-                {userData["mail"]}
-            </a>
-        )
-    }
-
->>>>>>> origin/main
 
     return(
         <header className="relative flex h-16 items-center justify-between bg-blue-900 px-2.5 shadow-md">
@@ -87,22 +64,13 @@ const Header = () => {
                 Charterly
             </h1>
 
-<<<<<<< HEAD
             <div className={"icon-button fill-primary dropdown h-10 z-9999 flex flex-row items-center justify-center aspect-square font-sans text-base bg-gray-100 hover:bg-gray-200 focus:bg-gray-400 rounded-full shadow-md p-2"}>
-=======
-            <button className={"button icon-button fill-primary dropdown h-10 z-9999"}>
->>>>>>> origin/main
                 <FaUserCircle></FaUserCircle>
                 <div className={"dropdown-content right-0"}>
                     {dropdown_elements}
                 </div>
-<<<<<<< HEAD
             </div>
-=======
-            </button>
->>>>>>> origin/main
         </header>)
-        
 }
 
 export default Header;
