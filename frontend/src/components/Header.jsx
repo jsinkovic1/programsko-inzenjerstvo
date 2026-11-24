@@ -1,4 +1,4 @@
-﻿﻿import {Component, use, useEffect, useState} from "react";
+﻿import {Component, use, useEffect, useState} from "react";
 import {FaUserCircle} from "react-icons/fa";
 import {data} from "react-router-dom";
 
@@ -28,7 +28,7 @@ const Header = () => {
             Prijava
         </a>
     )
-    if (userData != null)
+    if (userData != null || userData != "")
     {
         dropdown_elements = (
             <a href={"/profile"}>
