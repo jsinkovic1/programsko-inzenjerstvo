@@ -28,7 +28,8 @@ const Header = () => {
             Prijava
         </a>
     )
-    if (userData != null || userData != "")
+    console.log(userData=="");
+    if (userData != "")
     {
         dropdown_elements = (
             <a href={"/profile"}>
