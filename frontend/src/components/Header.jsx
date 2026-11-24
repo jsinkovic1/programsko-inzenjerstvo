@@ -20,7 +20,7 @@ const Header = () => {
     const [userData, setUserData] = useState([]);
 
     useEffect(() => {
-        fetch("api/auth/me").then(res => res.json()).then(data => setUserData(data))
+        fetch("api/auth/me").then(res => res.ok ? res.json() : null).then(data => setUserData(data))
     }, []);
     
     var dropdown_elements = (
