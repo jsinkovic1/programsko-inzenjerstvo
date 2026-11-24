@@ -11,8 +11,6 @@ class Accordion extends Component {
         this.setState({
             collapsed: !this.state.collapsed
         });
-
-        console.log(this.props)
     }
 
     render() {

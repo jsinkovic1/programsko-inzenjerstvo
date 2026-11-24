@@ -1,5 +1,6 @@
-﻿import {Component} from "react";
+﻿import {Component, use, useEffect, useState} from "react";
 import {FaUserCircle} from "react-icons/fa";
+import {data} from "react-router-dom";
 
 function Logo() {
   return (
@@ -15,51 +16,46 @@ function Logo() {
   );
 }
 
-class Header extends Component {
-    
-    populate_dropdown() {
-        var res = null
-        fetch("/api/auth/me").then(x => x.json()).then(x => {res = x})
-        if (res == null)
-        {
-            return (
-                <a href={"/login"}>
-                    Prijava
-                </a>
-            )
-        }
-        else
-        {
-            return (
-                <a href={"/user"}>
-                    {res["mail"]}
-                </a>
-            )
-        }
-        
+const Header = () => {
+    const [userData, setUserData] = useState([]);
 
-    }
+    useEffect(() => {
+        fetch("api/auth/me").then(res => res.json()).then(data => setUserData(data))
+    }, []);
     
-    render() {
-        return ( 
-      <header className="relative flex h-16 items-center justify-between bg-blue-900 px-2.5 shadow-md">
-        <a href="/" className="flex" aria-label="Charter home">
-          <Logo />
+    var dropdown_elements = (
+        <a href={"/login"}>
+            Prijava
         </a>
-
-        <h1 className="absolute left-1/2 -translate-x-1/2 font-title text-2xl font-medium text-white">
-          Charterly
-        </h1>
-
-        <button className={"button icon-button fill-primary dropdown h-10 z-9999"}>
-            <FaUserCircle></FaUserCircle>
-            <div className={"dropdown-content right-0"}>
-                {this.populate_dropdown()}
-            </div>
-        </button>
-      </header>
+    )
+    if (userData != null)
+    {
+        dropdown_elements = (
+            <a href={"/profile"}>
+                {userData["mail"]}
+            </a>
         )
     }
+
+
+    return(
+        <header className="relative flex h-16 items-center justify-between bg-blue-900 px-2.5 shadow-md">
+            <a href="/" className="flex" aria-label="Charter home">
+                <Logo />
+            </a>
+
+            <h1 className="absolute left-1/2 -translate-x-1/2 font-title text-2xl font-medium text-white">
+                Charterly
+            </h1>
+
+            <button className={"button icon-button fill-primary dropdown h-10 z-9999"}>
+                <FaUserCircle></FaUserCircle>
+                <div className={"dropdown-content right-0"}>
+                    {dropdown_elements}
+                </div>
+            </button>
+        </header>)
+        
 }
 
 export default Header;

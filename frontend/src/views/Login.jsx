@@ -7,7 +7,6 @@ export default function Login() {
             <Header/>
             <div className="bg-gray-100 grow flex flex-col items-center justify-center pt-10 pb-10">
                 <div className="bg-white h-30 w-100 rounded-lg shadow-md flex flex-col items-center p-4 gap-2">
-                    <meta name="google-signin-client_id" content={import.meta.env.PUBLIC_GOOGLE_CLIENT_ID}/>
                     <div className="font-title text-lg">
                         Prijava
                     </div>
