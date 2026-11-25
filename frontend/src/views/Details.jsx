@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Search from "./Search"
 import DropdownDiv from "../components/DropdownDiv.jsx";
 import RangeSlider from "../components/RangeSlider.jsx";
+import CheckboxGroup from '../components/CheckboxGroup.jsx';
 import Footer from '../components/Footer.jsx';
 import BoatCard from '../components/BoatCard.jsx';
 
@@ -18,6 +19,10 @@ function Details()
     const [priceLower, setPriceLower] = useState("0")
     const [priceHigher, setPriceHigher] = useState("")
     const [maxPrice, setMaxPrice] = useState(0)
+    const [vesselTypes, setVesselTypes] = useState([])
+    const [selectedTypes, setSelectedTypes] = useState([])
+    const [selectedHarbors, setSelectedHarbors] = useState([]) 
+    const [resetKey, setResetKey] = useState(0)
 
     const fetchAll = () => {
         fetch("/api/plovilo")
@@ -45,11 +50,22 @@ function Details()
         .then(data => setHarborNames(Object.fromEntries(data.map(h => [h.idluke, h.nazivluke]))))
         .catch(() => setHarborNames({}))
     }, [])
+
+    useEffect(() => {
+        fetch("/api/plovilo/tipplovila")
+        .then(response => response.ok ? response.json() : [])
+        .then(data => setVesselTypes(data.map(x => x["nazivtipaplovila"])))
+        .catch(() => setVesselTypes([]))
+    }, [])
+
     
-    const handlePriceFilter = async(e) => {
+    const handleFilter = async(e) => {
         e.preventDefault();
 
         try {
+            const harborIds = Object.entries(harborNames)
+                .filter(([id, name]) => selectedHarbors.includes(name))
+                .map(([id]) => Number(id))
             const response = await fetch("/api/Filter", {
                 method:"POST",
                 headers: {
@@ -57,7 +73,8 @@ function Details()
                 },
                 body: JSON.stringify({
                     priceLower: priceLower !== "" && Number(priceLower) > 0 ? Number(priceLower) : null,
-                    priceHigher: priceHigher !== "" && Number(priceHigher) < maxPrice ? Number(priceHigher) : null
+                    VesselTypes: selectedTypes.length > 0 ? selectedTypes : null,
+                    HarborIds: harborIds.length > 0 ? harborIds : null
                 })
             })
             
@@ -74,6 +91,9 @@ function Details()
     const handleReset = () => {
         setPriceLower("0");
         setPriceHigher(String(maxPrice));
+        setSelectedTypes([]);
+        setSelectedHarbors([]);
+        setResetKey(k => k + 1);
         fetchAll();
     };
 
@@ -87,7 +107,7 @@ function Details()
                     
                 </div>
                 <DropdownDiv header={"Cijena"}>
-                    <form onSubmit={handlePriceFilter}>
+                    <form onSubmit={handleFilter}>
                          <div className = "flex flex-row">
                             <div className = "flex flex-col text-sm text-gray-700 gap-2 font-semibold">
                                 <label>Najniža cijena</label>
@@ -129,6 +149,32 @@ function Details()
                             <button type = "button" onClick={handleReset} className="button">
                                 Poništi
                             </button>
+                        </div>
+                    </form>
+                </DropdownDiv>
+                <DropdownDiv header={"Vrsta plovila"}>
+                    <form onSubmit={handleFilter}>
+                        <CheckboxGroup
+                            key={"types-" + resetKey}
+                            options={vesselTypes}
+                            onChange={setSelectedTypes}
+                        />
+                        <div className="flex flex-row justify-evenly">
+                            <button type="submit" className="button fill-primary">Pretraži</button>
+                            <button type="button" onClick={handleReset} className="button">Poništi</button>
+                        </div>
+                    </form>
+                </DropdownDiv>
+                <DropdownDiv header={"Luka"}>
+                    <form onSubmit={handleFilter}>
+                        <CheckboxGroup
+                            key={"harbors-" + resetKey}
+                            options={Object.values(harborNames)}
+                            onChange={setSelectedHarbors}
+                        />
+                        <div className="flex flex-row justify-evenly">
+                            <button type="submit" className="button fill-primary">Pretraži</button>
+                            <button type="button" onClick={handleReset} className="button">Poništi</button>
                         </div>
                     </form>
                 </DropdownDiv>
