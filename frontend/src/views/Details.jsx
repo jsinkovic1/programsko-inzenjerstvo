@@ -14,14 +14,19 @@ function Details()
     const navigate=useNavigate()
 
     const[search, setSearch] = useState("")
-    const [priceLower, setPriceLower] = useState("")
+    const [priceLower, setPriceLower] = useState("0")
     const [priceHigher, setPriceHigher] = useState("")
+    const [maxPrice, setMaxPrice] = useState(0)
 
     const fetchAll = () => {
         fetch("/api/plovilo")
         .then(response => response.json())
         .then(data => {
             setBoats(data)
+            const highest = Math.max(0, ...data.map(boat => boat.dnevnacijenanajma))
+            const roundedMax = Math.ceil(highest / 100) * 100
+            setMaxPrice(roundedMax)
+            setPriceHigher(current => current === "" ? String(roundedMax) : current)
         })
     };
 
@@ -42,10 +47,6 @@ function Details()
     
     const handlePriceFilter = async(e) => {
         e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const priceLower = formData.get('priceLower');
-        const priceHigher = formData.get('priceHigher');
 
         try {
             const response = await fetch("/api/Filter", {
@@ -54,8 +55,8 @@ function Details()
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    priceLower: priceLower ? parseFloat(priceLower) : null,
-                    priceHigher: priceHigher ? parseFloat(priceHigher) : null
+                    priceLower: priceLower !== "" && Number(priceLower) > 0 ? Number(priceLower) : null,
+                    priceHigher: priceHigher !== "" && Number(priceHigher) < maxPrice ? Number(priceHigher) : null
                 })
             })
             
@@ -70,8 +71,8 @@ function Details()
     }
 
     const handleReset = () => {
-        setPriceLower("");
-        setPriceHigher("");
+        setPriceLower("0");
+        setPriceHigher(String(maxPrice));
         fetchAll();
     };
 
@@ -141,21 +142,37 @@ function Details()
                          <div className = "flex flex-row">
                             <div className = "flex flex-col text-sm text-gray-700 gap-2 font-semibold">
                                 <label>Najniža cijena</label>
-                                <input 
+                                <input
                                 type="number"
-                                name="priceLower" 
+                                name="priceLower"
+                                min={0}
+                                value={priceLower}
+                                onChange={(e) => setPriceLower(e.target.value)}
                                 className="bg-white rounded-md py-2 px-3 w-36 mr-2 mt-2"
-
                                 />
                             </div>
                             <div className = "flex flex-col text-sm text-gray-700 gap-2 font-semibold">
                                 <label>Najviša cijena</label>
-                                <input name="priceHigher" 
+                                <input name="priceHigher"
                                 type ="number"
+                                min={0}
+                                value={priceHigher}
+                                onChange={(e) => setPriceHigher(e.target.value)}
                                 className="bg-white rounded-md py-2 px-3 w-36 mr-2 mt-2"/>
                             </div>
                         </div>
-                        <RangeSlider min={0} max={10} step={1}/>
+                        {/* Klizač i polja prikazuju istu vrijednost; ako korisnik isprazni polje, ručica stoji na rubu */}
+                        <RangeSlider
+                            min={0}
+                            max={maxPrice}
+                            step={10}
+                            valueLow={priceLower === "" ? 0 : Number(priceLower)}
+                            valueHigh={priceHigher === "" ? maxPrice : Number(priceHigher)}
+                            onChange={(low, high) => {
+                                setPriceLower(String(low))
+                                setPriceHigher(String(high))
+                            }}
+                        />
                         <div className = "flex flex-row justify-evenly">
                             <button type="submit" className="button fill-primary">
                                 Pretraži

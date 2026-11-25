@@ -59,25 +59,58 @@ function HarborMarker({ position, name, id, filter}) {
         </Marker>)
 }
 
+const EMPTY_FILTER = {
+    VesselName: null,
+    CapacityLower: null,
+    CapacityHigher: null,
+    CabinNumberLower: null,
+    CabinNumberHigher: null,
+    BedNumberLower: null,
+    BedNumberHigher: null
+}
+
+// Donje granice klizača: kapacitet je u bazi uvijek barem 1, a broj kabina i ležajeva može biti 0
+const MIN_CAPACITY = 1
+const MIN_CABINS = 0
+const MIN_BEDS = 0
+
 function Map() {
-    const [filter, setFilter] = useState({
-        VesselName: "",
-        CapacityLower: null,
-        CapacityHigher: null,
-        CabinNumberLower: null,
-        CabinNumberHigher: null,
-        BedNumberLower: null,
-        BedNumberHigher: null
-    })
+    const [filter, setFilter] = useState(EMPTY_FILTER)
     const [pins, setPins] = useState(null)
-    
-    console.log(filter)
+    // Gornje granice klizača uzimaju se iz kataloga (najveće vrijednosti), a 10 je samo početna vrijednost dok podaci ne stignu
+    const [limits, setLimits] = useState({capacity: 10, cabins: 10, beds: 10})
 
     useEffect(() => {
         fetch("/api/luka").then(response => response.json()).then(data => {
             setPins(data)
         })
     }, [])
+
+    useEffect(() => {
+        fetch("/api/plovilo")
+            .then(response => response.ok ? response.json() : [])
+            .then(data => {
+                if (data.length === 0) return
+                setLimits({
+                    capacity: Math.max(...data.map(v => v.kapacitet)),
+                    cabins: Math.max(...data.map(v => v.brojkabina)),
+                    beds: Math.max(...data.map(v => v.brojlezajeva))
+                })
+            })
+            .catch(() => {})
+    }, [])
+
+    // Vraća onChange za klizač: ručica na rubu raspona znači „bez ograničenja" (null),
+    // inače se u filtar upisuje odabrana granica
+    const rangeHandler = (lowKey, highKey, min, max) => (low, high) =>
+        setFilter(current => ({
+            ...current,
+            [lowKey]: low <= min ? null : low,
+            [highKey]: high >= max ? null : high
+        }))
+
+    // Tekst uz naziv klizača, npr. „2 – 8"
+    const rangeLabel = (low, high, min, max) => `${low ?? min} - ${high ?? max}`
 
     try {
         var markers = pins.map(pin => <HarborMarker position={[parseFloat(pin["latituda"]), parseFloat(pin["longituda"])]} name={pin["nazivluke"]} id={pin["idluke"]} filter={filter}/>)
@@ -100,49 +133,39 @@ function Map() {
             </MapContainer>
 
             <div className={"w-70 absolute z-1000 top-16 flex flex-col gap-2 p-2"}>
-                <input type="text" onChange={(e) => setFilter(
-                {
-                        ...filter,
-                        VesselName: e.target.value.length > 0 ? e.target.value : null
-                    }
-                )} placeholder={"Naziv plovila"} className="text-input"/>
+                <input type="text" value={filter.VesselName ?? ""} onChange={(e) => {
+                    const value = e.target.value
+                    setFilter(current => ({...current, VesselName: value.length > 0 ? value : null}))
+                }} placeholder={"Naziv plovila"} className="text-input"/>
                 <Accordion header={"Filter"}>
-                    Kapacitet
-                    <RangeSlider onChange={(min, max) => {
-                        let newFilter = {
-                            ...filter,
-                            CapacityLower: min,
-                            CapacityHigher: max
-                        };
-                        setFilter(newFilter)
-                    }} min={1} max={10} step={1}/>
-                    Kabina
-                    <RangeSlider onChange={(min, max) => {
-                        let newFilter = {
-                            ...filter,
-                            CabinNumberLower: min,
-                            CabinNumberHigher: max
-                        };
-                        setFilter(newFilter)
-                    }} min={1} max={10} step={1}/>
-                    Ležajeva
-                    <RangeSlider onChange={(min, max) => {
-                        let newFilter = {
-                            ...filter,
-                            BedNumberLower: min,
-                            BedNumberHigher: max
-                        };
-                        setFilter(newFilter)
-                    }} min={1} max={10} step={1}/>
-                    <button className={"button"} onClick={() => setFilter({
-                        VesselName: "",
-                        CapacityLower: null,
-                        CapacityHigher: null,
-                        CabinNumberLower: null,
-                        CabinNumberHigher: null,
-                        BedNumberLower: null,
-                        BedNumberHigher: null
-                    })}>Reset</button>
+                    Kapacitet: {rangeLabel(filter.CapacityLower, filter.CapacityHigher, MIN_CAPACITY, limits.capacity)}
+                    <RangeSlider
+                        min={MIN_CAPACITY}
+                        max={limits.capacity}
+                        step={1}
+                        valueLow={filter.CapacityLower ?? MIN_CAPACITY}
+                        valueHigh={filter.CapacityHigher ?? limits.capacity}
+                        onChange={rangeHandler("CapacityLower", "CapacityHigher", MIN_CAPACITY, limits.capacity)}
+                    />
+                    Kabina: {rangeLabel(filter.CabinNumberLower, filter.CabinNumberHigher, MIN_CABINS, limits.cabins)}
+                    <RangeSlider
+                        min={MIN_CABINS}
+                        max={limits.cabins}
+                        step={1}
+                        valueLow={filter.CabinNumberLower ?? MIN_CABINS}
+                        valueHigh={filter.CabinNumberHigher ?? limits.cabins}
+                        onChange={rangeHandler("CabinNumberLower", "CabinNumberHigher", MIN_CABINS, limits.cabins)}
+                    />
+                    Ležajeva: {rangeLabel(filter.BedNumberLower, filter.BedNumberHigher, MIN_BEDS, limits.beds)}
+                    <RangeSlider
+                        min={MIN_BEDS}
+                        max={limits.beds}
+                        step={1}
+                        valueLow={filter.BedNumberLower ?? MIN_BEDS}
+                        valueHigh={filter.BedNumberHigher ?? limits.beds}
+                        onChange={rangeHandler("BedNumberLower", "BedNumberHigher", MIN_BEDS, limits.beds)}
+                    />
+                    <button className={"button"} onClick={() => setFilter(EMPTY_FILTER)}>Reset</button>
                 </Accordion>
             </div>
         </div>
