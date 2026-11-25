@@ -76,8 +76,8 @@ namespace CharterBackend.Controllers
 			var result = vessels.Where(v => Fuzz.WeightedRatio(v.Nazivplovila, name, FuzzySharp.PreProcess.PreprocessMode.Full) >= 70);
 			return Ok(result);
 		}
-
-		[HttpGet("/tipplovila")]
+		
+		[HttpGet("tipplovila")]
 		public async Task<IActionResult> GetAllVesselType()
 		{
 			var vesselTypes = await ctx.Tipplovila.Select(t => new {t.Idtipaplovila, t.Nazivtipaplovila}).ToListAsync();
