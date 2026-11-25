@@ -6,11 +6,11 @@ export default function Home() {
   const boatCount = 999;
   const navigate=useNavigate();
   return (
+    <>
     <div className="min-h-screen bg-white font-sans text-black">
         <Header/>
         <title>Charterly - najam plovila</title>
       <main>
-        {/* Hero */}
         <section className="flex h-[528px] flex-col items-center justify-center gap-[62px] px-4 text-center max-md:h-auto max-md:gap-10 max-md:py-20">
           <h2 className="text-[clamp(28px,4vw,52px)] font-normal tracking-[0.01em]">
             Unajmite jedno od {boatCount} plovila danas!
@@ -23,8 +23,6 @@ export default function Home() {
             Otvori kartu
           </button>
         </section>
-
-        {/* Boat cards (placeholders) */}
         <section
           aria-label="Plovila"
           className="mx-auto grid max-w-[1064px] grid-cols-1 gap-5 px-4 md:grid-cols-3 md:gap-[59px]"
@@ -36,8 +34,9 @@ export default function Home() {
             />
           ))}
         </section>
-      </main>
-          <Footer/>
+      </main>   
     </div>
+      <Footer/>
+    </>
   );
 }
