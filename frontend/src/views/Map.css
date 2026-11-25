@@ -67,6 +67,7 @@ body,
     align-content: center !important;
     justify-content: center !important;
     text-align: center !important;
+    pointer-events: none !important;
     @apply font-sans text-base bg-gray-600 border-2 border-white rounded-full text-white
 }
 
