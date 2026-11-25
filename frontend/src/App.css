@@ -4,6 +4,12 @@
 @theme {
     --font-sans: "Inter", system-ui, sans-serif;
     --font-title: "Roboto", sans-serif;
+
+    /* Boje aplikacije: navy odgovara zaglavlju (blue-900), aqua i surface boje su logotipa, gold akcentnoj boji (amber-500) */
+    --color-navy: #1c398e;
+    --color-aqua: #98d3df;
+    --color-surface: #efefef;
+    --color-gold: #f59e0b;
 }
 
 .button

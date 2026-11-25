@@ -8,6 +8,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white font-sans text-black">
         <Header/>
+        <title>Charterly - najam plovila</title>
       <main>
         {/* Hero */}
         <section className="flex h-[528px] flex-col items-center justify-center gap-[62px] px-4 text-center max-md:h-auto max-md:gap-10 max-md:py-20">

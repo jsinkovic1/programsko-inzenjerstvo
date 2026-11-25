@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Search from "./Search"
 import DropdownDiv from "../components/DropdownDiv.jsx";
 import RangeSlider from "../components/RangeSlider.jsx";
+import Footer from '../components/Footer.jsx';
 
 function Details()
 {
@@ -26,6 +27,17 @@ function Details()
 
     useEffect(() => {
         fetchAll();
+    }, [])
+
+    // Nazivi luka dohvaćaju se jednom i spremaju kao { idluke: nazivluke },
+    // pa se uz svako plovilo ispisuje naziv luke prema njegovom idluke
+    const [harborNames, setHarborNames] = useState({})
+
+    useEffect(() => {
+        fetch("/api/luka")
+        .then(response => response.ok ? response.json() : [])
+        .then(data => setHarborNames(Object.fromEntries(data.map(h => [h.idluke, h.nazivluke]))))
+        .catch(() => setHarborNames({}))
     }, [])
     
     const handlePriceFilter = async(e) => {
@@ -96,7 +108,7 @@ function Details()
                 <div className="flex flex-col md:justify-between items-center md:items-end w-full md:w-auto h-full gap-4 mt-2 md:mt-0">
                     <div className="flex md:flex-col items-center md:items-end justify-between w-full gap-2">
                         <h1 className = "text-navy font-title text-base">
-                            (ime luke)
+                            {harborNames[boat.idluke] ?? ""}
                         </h1>
                         <div className="text-lg text-amber-500 font-bold my-1 gap-1">
                             {boat["dnevnacijenanajma"]} €
@@ -117,6 +129,7 @@ function Details()
 
     return (<>
     <Header/>
+    <title>Plovila | Charterly</title>
         <div className = "flex flex-col items-center gap-4 min-h-screen bg-white font-sans text-black">
             <div className="w-3/4 mt-4 flex flex-row gap-4">
                 <Search search = {search} setSearch = {setSearch}/>
@@ -156,6 +169,7 @@ function Details()
             </div>
             {cards}
         </div>
+        <Footer/>
     </>)
 
 

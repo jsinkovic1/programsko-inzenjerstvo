@@ -90,6 +90,7 @@ function Map() {
     return (<>
         <div className={"h-full flex flex-col"}>
             <Header/>
+            <title>Karta luka | Charterly</title>
             <MapContainer id="map" className={"h-full"} center={position} zoom={13} scrollWheelZoom={true} zoomControl={false}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.thunderforest.com/" target="_blank">Thunderforest</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

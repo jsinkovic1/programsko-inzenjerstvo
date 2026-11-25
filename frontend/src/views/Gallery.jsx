@@ -19,6 +19,7 @@ function Gallery() {
 
     return (
         <div className={"grid grid-cols-5 p-10 gap-2"}>
+            <title>Galerija komponenata | Charterly</title>
             <div className={"flex flex-col gap-2"}>
                 {/* Obican gumb */}
                 <button onClick={() => nav("/map")} className={"button"}>

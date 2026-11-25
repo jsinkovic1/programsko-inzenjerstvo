@@ -11,6 +11,7 @@ import 'leaflet/dist/leaflet.css';
 import "./Map.css"
 import {MapContainer, TileLayer} from "react-leaflet";
 import { useNavigate } from 'react-router-dom';
+import Footer from '../components/Footer.jsx';
 
 const position = [44.08714036163615, 15.150380435125484] /*za svaku luku individualno?? */
 
@@ -125,9 +126,11 @@ function Vessel() {
 
     return (<>
     <Header/>
+    <title>{boat ? `${boat.nazivplovila} | Charterly` : "Plovilo | Charterly"}</title>
         <div className = "flex flex-col items-center gap-4 min-h-screen bg-white font-sans text-black">
             {boat ? boatInfo(boat) : <p>Loading data.....</p>}
         </div>
+    <Footer/>
     </>)
 }
 export default Vessel;
