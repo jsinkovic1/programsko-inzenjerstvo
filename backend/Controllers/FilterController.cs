@@ -23,7 +23,7 @@ namespace CharterBackend.Controllers
         [HttpPost]
         public async Task<IActionResult> GetFIlteredVessels([FromBody] FilterDTO filterDTO)
         {
-            var query = ctx.Plovila.Include(v => v.Luka).Include(v => v.Termini).AsQueryable();
+            var query = ctx.Plovila.Include(v => v.Luka).Include(v => v.Termini).Include(v => v.Tipplovila).AsQueryable();
 
             if (filterDTO.CapacityLower.HasValue) query = query.Where(v => v.Kapacitet >= filterDTO.CapacityLower);
             if (filterDTO.CapacityHigher.HasValue) query = query.Where(v => v.Kapacitet <= filterDTO.CapacityHigher);
@@ -34,6 +34,7 @@ namespace CharterBackend.Controllers
             if (filterDTO.PriceLower.HasValue) query = query.Where(v => v.Dnevnacijenanajma >=  filterDTO.PriceLower);
             if (filterDTO.PriceHigher.HasValue) query = query.Where(v => v.Dnevnacijenanajma <= filterDTO.PriceHigher);
             if (filterDTO.HarborIds != null) query = query.Where(v => filterDTO.HarborIds.Contains(v.Idluke));
+            if(filterDTO.VesselTypes != null) query = query.Where(v => filterDTO.VesselTypes.Contains(v.Tipplovila.Nazivtipaplovila));
             if(filterDTO.TimeFrom.HasValue && filterDTO.TimeTo.HasValue)
             {
                 if (filterDTO.TimeFrom.Value > filterDTO.TimeTo.Value) return StatusCode(StatusCodes.Status400BadRequest, "Vrijednost datuma polaska ne smije biti veća od datuma povratka");

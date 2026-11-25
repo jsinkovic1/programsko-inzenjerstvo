@@ -17,5 +17,6 @@
         public DateTime? TimeFrom { get; set; } = null;
         public DateTime? TimeTo { get; set; } = null;
         public List<int>? HarborIds { get; set; } = null;
+        public List<string>? VesselTypes { get; set; } = null;
     }
 }
