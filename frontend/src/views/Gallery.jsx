@@ -8,6 +8,7 @@ import {useEffect, useState} from "react";
 import Vessel from "../models/Vessel.js";
 import {MdInsertEmoticon} from "react-icons/md";
 import Accordion from "../components/Accordion.jsx";
+import CheckboxGroup from "../components/CheckboxGroup.jsx";
 
 
 function Gallery() {
@@ -89,6 +90,16 @@ function Gallery() {
                     </button>
                 </div>
 
+                <select name="Select" className={"select"}>
+                    <option value="a">Opcija A</option>
+                    <option value="b">Opcija B</option>
+                    <option value="c">Opcija C</option>
+                    <option value="d">Opcija D</option>
+                </select>
+
+                <CheckboxGroup onChange={(x) => console.log(x)} options={
+                    ["op a", "op b", "op c", "op d"]
+                } />
             </div>
             <div className={"flex flex-col gap-2"}>
                 <CardSmall vessel={vessel}/>
