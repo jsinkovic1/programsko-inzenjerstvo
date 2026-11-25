@@ -1,4 +1,4 @@
-﻿import {Component, use, useEffect, useState} from "react";
+import {Component, use, useEffect, useState} from "react";
 import {FaUserCircle} from "react-icons/fa";
 import {data} from "react-router-dom";
 
@@ -22,21 +22,37 @@ const Header = () => {
     useEffect(() => {
         fetch("api/auth/me").then(res => res.ok ? res.json() : null).then(data => setUserData(data))
     }, []);
+
+    const handleLogout = async () =>{
+        const response = await fetch("/api/auth/logout", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            },
+            credentials: "include"
+        })
+        if (response.ok) setUserData("");
+    }
     
     var dropdown_elements = (
-        <a href={"/login"}>
-            Prijava
-        </a>
+            <a href="/login">
+                Prijava
+            </a>
+            
     )
-    if (userData != null)
+    if (userData != "")
     {
         dropdown_elements = (
-            <a href={"/profile"}>
+            <>
+              <a href={"/profile"}>
                 {userData["mail"]}
-            </a>
+              </a>
+              <button onClick={handleLogout} className="cursor-pointer">
+                  Odjava
+              </button>
+            </>
         )
     }
-
 
     return(
         <header className="relative flex h-16 items-center justify-between bg-blue-900 px-2.5 shadow-md">
@@ -48,14 +64,13 @@ const Header = () => {
                 Charterly
             </h1>
 
-            <button className={"button icon-button fill-primary dropdown h-10 z-9999"}>
+            <div className={"icon-button fill-primary dropdown h-10 z-9999 flex flex-row items-center justify-center aspect-square font-sans text-base bg-gray-100 hover:bg-gray-200 focus:bg-gray-400 rounded-full shadow-md p-2"}>
                 <FaUserCircle></FaUserCircle>
                 <div className={"dropdown-content right-0"}>
                     {dropdown_elements}
                 </div>
-            </button>
+            </div>
         </header>)
-        
 }
 
 export default Header;

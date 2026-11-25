@@ -94,3 +94,4 @@ out
 /backend/Properties/
 backend/Properties/
 /frontend/cert
+*.csproj.user

@@ -94,6 +94,19 @@ namespace CharterBackend.Controllers
                 Uloga = User.FindFirstValue(ClaimTypes.Role)
             });
         }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            // Briše se JWT kolačić
+            Response.Cookies.Delete("ACCESS_TOKEN");
+
+            // Briše se privremeni kolačić ostao od prijave putem Googlea
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return NoContent();
+        }
     }
 
 }
