@@ -73,8 +73,9 @@ function Details()
                 },
                 body: JSON.stringify({
                     priceLower: priceLower !== "" && Number(priceLower) > 0 ? Number(priceLower) : null,
-                    VesselTypes: selectedTypes.length > 0 ? selectedTypes : null,
-                    HarborIds: harborIds.length > 0 ? harborIds : null
+                    priceHigher: priceHigher !== "" && Number(priceHigher) <= maxPrice ? Number(priceHigher) : null,
+                    vesselTypes: selectedTypes.length > 0 ? selectedTypes : null,
+                    harborIds: harborIds.length > 0 ? harborIds : null
                 })
             })
             
