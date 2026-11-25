@@ -6,10 +6,9 @@ import Footer from "../components/Footer.jsx";
 import BoatCard from '../components/BoatCard.jsx';
 
 export default function Home() {
-  const boatCount = 999;
   const navigate=useNavigate();
 
-  const [popular, setPopular] = useState([])
+  const [boats, setBoats] = useState([])
 
   useEffect(() => {
   fetch("/api/plovilo")
@@ -17,7 +16,7 @@ export default function Home() {
       if (!response.ok) throw new Error("HTTP " + response.status);
       return response.json();
     })
-    .then(data => setPopular(data.slice(0, 3)))
+    .then(data => setBoats(data))
     .catch(err => console.error("Greška kod dohvata plovila:", err));
 }, []);
   const [harborNames, setHarborNames] = useState({})
@@ -28,6 +27,9 @@ export default function Home() {
         .then(data => setHarborNames(Object.fromEntries(data.map(h => [h.idluke, h.nazivluke]))))
         .catch(() => setHarborNames({}))
     }, [])
+
+    const popular = boats.slice(0, 3);
+    const boatCount = boats.length > 0 ? boats.length : 999;
 
   return (
     <>
