@@ -19,6 +19,7 @@ function HarborMarker({position, name, id, filter}) {
             method: "POST",
             body: JSON.stringify({
                 ...filter,
+                VesselTypes: filter.VesselTypes != null ? (filter.VesselTypes.length > 0 ? filter.VesselTypes : null) : null,
                 harborIds: [id]
             }),
             headers: {
@@ -33,6 +34,7 @@ function HarborMarker({position, name, id, filter}) {
                 method: "POST",
                 body: JSON.stringify({
                     ...filter,
+                    VesselTypes: filter.VesselTypes != null ? (filter.VesselTypes.length > 0 ? filter.VesselTypes : null) : null,
                     HarborIds: [id]
                 }),
                 headers: {
