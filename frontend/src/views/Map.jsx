@@ -11,20 +11,21 @@ import Accordion from "../components/Accordion.jsx";
 import CheckboxGroup from "../components/CheckboxGroup.jsx";
 
 
-function HarborMarker({ position, name, id, filter}) {
+function HarborMarker({position, name, id, filter}) {
     const [vesselCards, SetVesselCards] = useState("")
 
     useEffect(() => {
-       fetch("/api/filter", {
+        fetch("/api/filter", {
             method: "POST",
             body: JSON.stringify({
                 ...filter,
-                harborIds: [id] 
+                harborIds: [id]
             }),
             headers: {
                 "Content-type": "application/json; charset=UTF-8"
             }
-        }).then(x => x.json()).then(json => SetVesselCards(json.map(x => (<CardSmall vessel={new Vessel(x)} viewButton={true}/>))))
+        }).then(x => x.json()).then(json => SetVesselCards(json.map(x => (
+            <CardSmall vessel={new Vessel(x)} viewButton={true}/>))))
     }, [filter, id]);
     const eventHandlers = useMemo(() => ({
         async popupopen() {
@@ -32,7 +33,7 @@ function HarborMarker({ position, name, id, filter}) {
                 method: "POST",
                 body: JSON.stringify({
                     ...filter,
-                    HarborIds: [id] 
+                    HarborIds: [id]
                 }),
                 headers: {
                     "Content-type": "application/json; charset=UTF-8"
@@ -44,7 +45,10 @@ function HarborMarker({ position, name, id, filter}) {
         }
     }), [filter, id])
 
-    const divIcon = new DivIcon({className: vesselCards.length > 0 ? "marker" : "marker-disabled", html: vesselCards.length})
+    const divIcon = new DivIcon({
+        className: vesselCards.length > 0 ? "marker" : "marker-disabled",
+        html: vesselCards.length
+    })
     return (
         <Marker eventHandlers={eventHandlers} position={position} icon={divIcon} bind>
             <Popup closeButton={false}>
@@ -67,8 +71,8 @@ const EMPTY_FILTER = {
     CabinNumberHigher: null,
     BedNumberLower: null,
     BedNumberHigher: null,
-    model: null, 
-    PriceLower: null, 
+    model: null,
+    PriceLower: null,
     PriceHigher: null,
     VesselTypes: null,
 }
@@ -108,7 +112,8 @@ function Map() {
                     beds: Math.max(...data.map(v => v.brojlezajeva))
                 })
             })
-            .catch(() => {})
+            .catch(() => {
+            })
     }, [])
 
     // Vraća onChange za klizač: ručica na rubu raspona znači „bez ograničenja" (null),
@@ -124,7 +129,9 @@ function Map() {
     const rangeLabel = (low, high, min, max) => `${low ?? min} - ${high ?? max}`
 
     try {
-        var markers = pins.map(pin => <HarborMarker position={[parseFloat(pin["latituda"]), parseFloat(pin["longituda"])]} name={pin["nazivluke"]} id={pin["idluke"]} filter={filter}/>)
+        var markers = pins.map(pin => <HarborMarker
+            position={[parseFloat(pin["latituda"]), parseFloat(pin["longituda"])]} name={pin["nazivluke"]}
+            id={pin["idluke"]} filter={filter}/>)
     } catch {
         markers = ""
     }
@@ -135,7 +142,8 @@ function Map() {
         <div className={"h-full flex flex-col"}>
             <Header/>
             <title>Karta luka | Charterly</title>
-            <MapContainer id="map" className={"h-full"} center={position} zoom={13} scrollWheelZoom={true} zoomControl={false}>
+            <MapContainer id="map" className={"h-full"} center={position} zoom={13} scrollWheelZoom={true}
+                          zoomControl={false}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.thunderforest.com/" target="_blank">Thunderforest</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://api.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=100a2a4b0a6a4f76846b12b31fc115ff"
@@ -176,8 +184,9 @@ function Map() {
                         valueHigh={filter.BedNumberHigher ?? limits.beds}
                         onChange={rangeHandler("BedNumberLower", "BedNumberHigher", MIN_BEDS, limits.beds)}
                     />
-                    
-                    Dnevna Cijena: {rangeLabel(filter.PriceLower, filter.PriceHigher, 0, 9999 ) /* privremena granica cijene, u budućnosti dinamički po najskupljem u bazi podataka*/}
+
+                    Dnevna
+                    Cijena: {rangeLabel(filter.PriceLower, filter.PriceHigher, 0, 9999) /* privremena granica cijene, u budućnosti dinamički po najskupljem u bazi podataka*/}
                     <RangeSlider
                         min={0}
                         max={9999}
@@ -186,14 +195,14 @@ function Map() {
                         valueHigh={filter.PriceHigher ?? 9999}
                         onChange={rangeHandler("PriceLower", "PriceHigher", 0, 9999)}
                     />
-                    
+
                     Vrsta plovila:
-                    <CheckboxGroup onChange={(checked) =>         setFilter(current => ({
+                    <CheckboxGroup onChange={(checked) => setFilter(current => ({
                         ...current,
                         VesselTypes: checked
-                    }))} options={vesselTypes != null ? vesselTypes.map(x => x["nazivtipaplovila"]) : []} />
-                    
-                    
+                    }))} options={vesselTypes != null ? vesselTypes.map(x => x["nazivtipaplovila"]) : []}/>
+
+
                     <button className={"button"} onClick={() => setFilter(EMPTY_FILTER)}>Reset</button>
                 </Accordion>
             </div>
