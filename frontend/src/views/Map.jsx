@@ -4,11 +4,11 @@ import 'leaflet/dist/leaflet.css'
 import {useEffect, useMemo, useState} from "react";
 import "./Map.css"
 import {DivIcon} from "leaflet/src/layer/index.js";
-import placeholder from "../assets/placeholder.svg"
 import {CardSmall} from "../components/Cards.jsx";
 import Vessel from "../models/Vessel.js";
 import RangeSlider from "../components/RangeSlider.jsx";
 import Accordion from "../components/Accordion.jsx";
+import CheckboxGroup from "../components/CheckboxGroup.jsx";
 
 
 function HarborMarker({ position, name, id, filter}) {
@@ -66,7 +66,11 @@ const EMPTY_FILTER = {
     CabinNumberLower: null,
     CabinNumberHigher: null,
     BedNumberLower: null,
-    BedNumberHigher: null
+    BedNumberHigher: null,
+    model: null, 
+    PriceLower: null, 
+    PriceHigher: null,
+    VesselTypes: null,
 }
 
 // Donje granice klizača: kapacitet je u bazi uvijek barem 1, a broj kabina i ležajeva može biti 0
@@ -77,12 +81,19 @@ const MIN_BEDS = 0
 function Map() {
     const [filter, setFilter] = useState(EMPTY_FILTER)
     const [pins, setPins] = useState(null)
+    const [vesselTypes, setVesselTypes] = useState(null)
     // Gornje granice klizača uzimaju se iz kataloga (najveće vrijednosti), a 10 je samo početna vrijednost dok podaci ne stignu
     const [limits, setLimits] = useState({capacity: 10, cabins: 10, beds: 10})
 
     useEffect(() => {
         fetch("/api/luka").then(response => response.json()).then(data => {
             setPins(data)
+        })
+    }, [])
+
+    useEffect(() => {
+        fetch("/api/plovilo/tipplovila").then(response => response.json()).then(data => {
+            setVesselTypes(data)
         })
     }, [])
 
@@ -165,6 +176,24 @@ function Map() {
                         valueHigh={filter.BedNumberHigher ?? limits.beds}
                         onChange={rangeHandler("BedNumberLower", "BedNumberHigher", MIN_BEDS, limits.beds)}
                     />
+                    
+                    Dnevna Cijena: {rangeLabel(filter.PriceLower, filter.PriceHigher, 0, 9999 ) /* privremena granica cijene, u budućnosti dinamički po najskupljem u bazi podataka*/}
+                    <RangeSlider
+                        min={0}
+                        max={9999}
+                        step={25}
+                        valueLow={filter.PriceLower ?? 0}
+                        valueHigh={filter.PriceHigher ?? 9999}
+                        onChange={rangeHandler("PriceLower", "PriceHigher", 0, 9999)}
+                    />
+                    
+                    Vrsta plovila:
+                    <CheckboxGroup onChange={(checked) =>         setFilter(current => ({
+                        ...current,
+                        VesselTypes: checked
+                    }))} options={vesselTypes != null ? vesselTypes.map(x => x["nazivtipaplovila"]) : []} />
+                    
+                    
                     <button className={"button"} onClick={() => setFilter(EMPTY_FILTER)}>Reset</button>
                 </Accordion>
             </div>
