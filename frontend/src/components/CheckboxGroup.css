@@ -15,7 +15,7 @@
 {
     -webkit-appearance: none;
     appearance: none;
-    @apply cursor-pointer h-full aspect-square border-blue-900 bg-transparent border-2 rounded-md transition-colors
+    @apply cursor-pointer aspect-square h-6 border-blue-900 bg-transparent border-2 rounded-md transition-colors shrink-0
 }
 
 .checkbox-row > input[type="checkbox"]:checked
@@ -27,5 +27,5 @@
 
 .checkbox-label
 {
-    @apply font-sans pl-2 select-none
+    @apply shrink font-sans pl-2 select-none
 }

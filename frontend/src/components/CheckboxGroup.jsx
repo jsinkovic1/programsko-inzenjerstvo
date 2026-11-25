@@ -25,7 +25,7 @@ class CheckboxGroup extends Component {
                     this.props.options.map(option => (            
                     <div className={"checkbox-row"}>
                         <input onChange={this.handleChange} type="checkbox" value={option}/>
-                        <span className={"checkbox-label"}>{option}</span>
+                        <div className={"checkbox-label"}>{option}</div>
                     </div>
                     ))
             }
