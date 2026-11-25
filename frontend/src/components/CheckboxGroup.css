@@ -1,0 +1,31 @@
+﻿@import "tailwindcss";
+@import "../App.css";
+
+.checkbox-group
+{
+    @apply p-2 flex flex-col gap-2
+}
+
+.checkbox-row
+{
+    @apply flex flex-row
+}
+
+.checkbox-row > input[type="checkbox"]
+{
+    -webkit-appearance: none;
+    appearance: none;
+    @apply cursor-pointer aspect-square h-6 border-blue-900 bg-transparent border-2 rounded-md transition-colors shrink-0
+}
+
+.checkbox-row > input[type="checkbox"]:checked
+{
+    -webkit-appearance: none;
+    appearance: none;
+    @apply bg-blue-900
+}
+
+.checkbox-label
+{
+    @apply shrink font-sans pl-2 select-none
+}

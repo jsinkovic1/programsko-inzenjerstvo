@@ -1,10 +1,12 @@
 ﻿import Header from "../components/Header.jsx";
 import "../App.css"
+import Footer from "../components/Footer.jsx";
 
 export default function Login() {
     return (
-        <div className={"h-full flex flex-col"}>
+        <div className={"min-h-screen flex flex-col bg-gray-100"}>
             <Header/>
+            <title>Prijava | Charterly</title>
             <div className="bg-gray-100 grow flex flex-col items-center justify-center pt-10 pb-10">
                 <div className="bg-white h-30 w-100 rounded-lg shadow-md flex flex-col items-center p-4 gap-2">
                     <div className="font-title text-lg">
@@ -25,7 +27,7 @@ export default function Login() {
                     </a>
                 </div>
             </div>
-
+            <Footer/>
         </div>
     );
 }

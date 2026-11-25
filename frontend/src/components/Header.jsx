@@ -4,7 +4,7 @@ import {data} from "react-router-dom";
 
 function Logo() {
   return (
-    <svg className="size-[60px] fill-none" viewBox="0 0 100 100" role="img" aria-label="Charter logo">
+    <svg className="size-12 fill-none" viewBox="0 0 88 88" role="img" aria-label="Charterly logo">
     <path d="M85.5 44C85.5 66.9198 66.9198 85.5 44 85.5C21.0802 85.5 2.5 66.9198 2.5 44C2.5 21.0802 21.0802 2.5 44 2.5C66.9198 2.5 85.5 21.0802 85.5 44Z" strokeWidth="5" stroke="#98D3DF"/>
     <path d="M47.5828 2.37915V63.6418H7.28435L47.5828 2.37915Z" fill="#98D3DF"/>
     <path d="M61.8574 27.3601V58.8836H83.8643L61.8574 27.3601Z" fill="#98D3DF"/>
@@ -17,10 +17,10 @@ function Logo() {
 }
 
 const Header = () => {
-    const [userData, setUserData] = useState([]);
+    const [userData, setUserData] = useState(null);
 
     useEffect(() => {
-        fetch("api/auth/me").then(res => res.json()).then(data => setUserData(data))
+        fetch("/api/auth/me").then(res => res.ok ? res.json() : null).then(data => setUserData(data)).catch(() => setUserData(null));
     }, []);
 
     const handleLogout = async () =>{
@@ -31,7 +31,7 @@ const Header = () => {
             },
             credentials: "include"
         })
-        if (response.ok) setUserData("");
+        if (response.ok) setUserData(null);
     }
     
     var dropdown_elements = (
@@ -39,9 +39,9 @@ const Header = () => {
                 Prijava
             </a>
             
-    )
-    if (userData != "")
-    {
+    );
+
+    if (userData) {
         dropdown_elements = (
             <>
               <a href={"/profile"}>
@@ -56,7 +56,7 @@ const Header = () => {
 
     return(
         <header className="relative flex h-16 items-center justify-between bg-blue-900 px-2.5 shadow-md">
-            <a href="/" className="flex" aria-label="Charter home">
+            <a href="/" className="flex" aria-label="Charterly - početna">
                 <Logo />
             </a>
 

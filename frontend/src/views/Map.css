@@ -58,4 +58,17 @@ body,
     @apply font-sans text-base bg-blue-900 border-2 border-white rounded-full text-white
 }
 
+.marker-disabled {
+    position: absolute;
+    width: 32px !important;
+    height: 32px !important;
+    margin-left: -16px !important;
+    margin-top: -16px !important;
+    align-content: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    pointer-events: none !important;
+    @apply font-sans text-base bg-gray-600 border-2 border-white rounded-full text-white
+}
+
 

@@ -1,11 +1,14 @@
 ﻿import '../App.css'
 import Header from "../components/Header.jsx";
 import {useEffect, useState} from "react";
-import placeholder from "../assets/placeholder.svg";
+
 import { useNavigate } from 'react-router-dom';
 import Search from "./Search"
 import DropdownDiv from "../components/DropdownDiv.jsx";
 import RangeSlider from "../components/RangeSlider.jsx";
+import CheckboxGroup from '../components/CheckboxGroup.jsx';
+import Footer from '../components/Footer.jsx';
+import BoatCard from '../components/BoatCard.jsx';
 
 function Details()
 {
@@ -13,37 +16,65 @@ function Details()
     const navigate=useNavigate()
 
     const[search, setSearch] = useState("")
-    const [priceLower, setPriceLower] = useState("")
+    const [priceLower, setPriceLower] = useState("0")
     const [priceHigher, setPriceHigher] = useState("")
+    const [maxPrice, setMaxPrice] = useState(0)
+    const [vesselTypes, setVesselTypes] = useState([])
+    const [selectedTypes, setSelectedTypes] = useState([])
+    const [selectedHarbors, setSelectedHarbors] = useState([]) 
+    const [resetKey, setResetKey] = useState(0)
 
     const fetchAll = () => {
         fetch("/api/plovilo")
         .then(response => response.json())
         .then(data => {
             setBoats(data)
+            const highest = Math.max(0, ...data.map(boat => boat.dnevnacijenanajma))
+            const roundedMax = Math.ceil(highest / 100) * 100
+            setMaxPrice(roundedMax)
+            setPriceHigher(current => current === "" ? String(roundedMax) : current)
         })
     };
 
     useEffect(() => {
         fetchAll();
     }, [])
+
+    // Nazivi luka dohvaćaju se jednom i spremaju kao { idluke: nazivluke },
+    // pa se uz svako plovilo ispisuje naziv luke prema njegovom idluke
+    const [harborNames, setHarborNames] = useState({})
+
+    useEffect(() => {
+        fetch("/api/luka")
+        .then(response => response.ok ? response.json() : [])
+        .then(data => setHarborNames(Object.fromEntries(data.map(h => [h.idluke, h.nazivluke]))))
+        .catch(() => setHarborNames({}))
+    }, [])
+
+    useEffect(() => {
+        fetch("/api/plovilo/tipplovila")
+        .then(response => response.ok ? response.json() : [])
+        .then(data => setVesselTypes(data.map(x => x["nazivtipaplovila"])))
+        .catch(() => setVesselTypes([]))
+    }, [])
+
     
-    const handlePriceFilter = async(e) => {
+    const handleFilter = async(e) => {
         e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
-        const priceLower = formData.get('priceLower');
-        const priceHigher = formData.get('priceHigher');
 
         try {
+            const harborIds = Object.entries(harborNames)
+                .filter(([id, name]) => selectedHarbors.includes(name))
+                .map(([id]) => Number(id))
             const response = await fetch("/api/Filter", {
                 method:"POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    priceLower: priceLower ? parseFloat(priceLower) : null,
-                    priceHigher: priceHigher ? parseFloat(priceHigher) : null
+                    priceLower: priceLower !== "" && Number(priceLower) > 0 ? Number(priceLower) : null,
+                    VesselTypes: selectedTypes.length > 0 ? selectedTypes : null,
+                    HarborIds: harborIds.length > 0 ? harborIds : null
                 })
             })
             
@@ -58,65 +89,17 @@ function Details()
     }
 
     const handleReset = () => {
-        setPriceLower("");
-        setPriceHigher("");
+        setPriceLower("0");
+        setPriceHigher(String(maxPrice));
+        setSelectedTypes([]);
+        setSelectedHarbors([]);
+        setResetKey(k => k + 1);
         fetchAll();
     };
 
-    const boatDisplay = boats.filter((boat) => boat.nazivplovila.toLowerCase().includes(search.toLowerCase()))
-    console.log(boatDisplay) 
-
-    try {
-        var cards = boatDisplay.map(boat =>
-            <div key={boat.idplovila} className = "flex flex-col md:flex-row items-center md:items-start justify-between rounded-md shadow-md p-4 m-2 w-3/4 mx-auto gap-4">
-                {/*prvi stupac */}
-                <img src={placeholder} alt="boat" className="w-4/5 md:w-1/5 rounded-md object-contain" />
-                
-                {/*drugi stupac */}
-                <div className="flex flex-col justify-between flex-1 w-full gap-6 m-4 md:m-8">
-                    <div>
-                        <h1 className = "hover:text-blue-950 hover:cursor-pointer text-blue-900 font-title text-[clamp(16px,2vw,22px)] font-bold">
-                            <a href={`/vessel/${boat.idplovila}`}>{boat["nazivplovila"]}</a>
-                        </h1>
-                        <div className="text-sm text-amber-500 mt-1 flex items-center gap-1">
-                            {boat["model"]} - {boat["godinaproizvodnje"]} god.
-                        </div>
-                    </div>
-                    <div className="mt-2">
-                        <div className="text-sm text-gray-600 flex items-center gap-1">
-                            Broj kabina: {boat["brojkabina"]} 
-                        </div>
-                        <div className="text-sm text-gray-600 flex items-center gap-1">
-                            Broj ležajeva: {boat["brojlezajeva"]} 
-                        </div>
-                    </div>
-                </div>
-
-                {/*treci stupac */}
-                <div className="flex flex-col md:justify-between items-center md:items-end w-full md:w-auto h-full gap-4 mt-2 md:mt-0">
-                    <div className="flex md:flex-col items-center md:items-end justify-between w-full gap-2">
-                        <h1 className = "text-navy font-title text-base">
-                            (ime luke)
-                        </h1>
-                        <div className="text-lg text-amber-500 font-bold my-1 gap-1">
-                            {boat["dnevnacijenanajma"]} €
-                        </div>
-                    </div>
-                    <button 
-                    onClick={() => navigate(`/vessel/${boat.idplovila}`)}
-                    className = "buttton fill-primary hover:cursor-pointer font-semibold rounded-md px-4 py-2 w-full md:w-auto mt-2">
-                        Rezerviraj
-                    </button>
-                </div>
-            </div>
-        )
-    }
-    catch {
-        cards = ""
-    }
-
     return (<>
     <Header/>
+    <title>Plovila | Charterly</title>
         <div className = "flex flex-col items-center gap-4 min-h-screen bg-white font-sans text-black">
             <div className="w-3/4 mt-4 flex flex-row gap-4">
                 <Search search = {search} setSearch = {setSearch}/>
@@ -124,25 +107,41 @@ function Details()
                     
                 </div>
                 <DropdownDiv header={"Cijena"}>
-                    <form onSubmit={handlePriceFilter}>
+                    <form onSubmit={handleFilter}>
                          <div className = "flex flex-row">
                             <div className = "flex flex-col text-sm text-gray-700 gap-2 font-semibold">
                                 <label>Najniža cijena</label>
-                                <input 
+                                <input
                                 type="number"
-                                name="priceLower" 
+                                name="priceLower"
+                                min={0}
+                                value={priceLower}
+                                onChange={(e) => setPriceLower(e.target.value)}
                                 className="bg-white rounded-md py-2 px-3 w-36 mr-2 mt-2"
-
                                 />
                             </div>
                             <div className = "flex flex-col text-sm text-gray-700 gap-2 font-semibold">
                                 <label>Najviša cijena</label>
-                                <input name="priceHigher" 
+                                <input name="priceHigher"
                                 type ="number"
+                                min={0}
+                                value={priceHigher}
+                                onChange={(e) => setPriceHigher(e.target.value)}
                                 className="bg-white rounded-md py-2 px-3 w-36 mr-2 mt-2"/>
                             </div>
                         </div>
-                        <RangeSlider min={0} max={10} step={1}/>
+                        {/* Klizač i polja prikazuju istu vrijednost; ako korisnik isprazni polje, ručica stoji na rubu */}
+                        <RangeSlider
+                            min={0}
+                            max={maxPrice}
+                            step={10}
+                            valueLow={priceLower === "" ? 0 : Number(priceLower)}
+                            valueHigh={priceHigher === "" ? maxPrice : Number(priceHigher)}
+                            onChange={(low, high) => {
+                                setPriceLower(String(low))
+                                setPriceHigher(String(high))
+                            }}
+                        />
                         <div className = "flex flex-row justify-evenly">
                             <button type="submit" className="button fill-primary">
                                 Pretraži
@@ -153,9 +152,42 @@ function Details()
                         </div>
                     </form>
                 </DropdownDiv>
+                <DropdownDiv header={"Vrsta plovila"}>
+                    <form onSubmit={handleFilter}>
+                        <CheckboxGroup
+                            key={"types-" + resetKey}
+                            options={vesselTypes}
+                            onChange={setSelectedTypes}
+                        />
+                        <div className="flex flex-row justify-evenly">
+                            <button type="submit" className="button fill-primary">Pretraži</button>
+                            <button type="button" onClick={handleReset} className="button">Poništi</button>
+                        </div>
+                    </form>
+                </DropdownDiv>
+                <DropdownDiv header={"Luka"}>
+                    <form onSubmit={handleFilter}>
+                        <CheckboxGroup
+                            key={"harbors-" + resetKey}
+                            options={Object.values(harborNames)}
+                            onChange={setSelectedHarbors}
+                        />
+                        <div className="flex flex-row justify-evenly">
+                            <button type="submit" className="button fill-primary">Pretraži</button>
+                            <button type="button" onClick={handleReset} className="button">Poništi</button>
+                        </div>
+                    </form>
+                </DropdownDiv>
             </div>
-            {cards}
+            {boats && boats.map(boat => (
+                <BoatCard 
+                    key={boat.idplovila} 
+                    boat={boat} 
+                    harborName={harborNames[boat.idluke]} 
+                />
+            ))}
         </div>
+        <Footer/>
     </>)
 
 

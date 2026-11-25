@@ -8,6 +8,7 @@ import {useEffect, useState} from "react";
 import Vessel from "../models/Vessel.js";
 import {MdInsertEmoticon} from "react-icons/md";
 import Accordion from "../components/Accordion.jsx";
+import CheckboxGroup from "../components/CheckboxGroup.jsx";
 
 
 function Gallery() {
@@ -19,6 +20,7 @@ function Gallery() {
 
     return (
         <div className={"grid grid-cols-5 p-10 gap-2"}>
+            <title>Galerija komponenata | Charterly</title>
             <div className={"flex flex-col gap-2"}>
                 {/* Obican gumb */}
                 <button onClick={() => nav("/map")} className={"button"}>
@@ -88,6 +90,16 @@ function Gallery() {
                     </button>
                 </div>
 
+                <select name="Select" className={"select"}>
+                    <option value="a">Opcija A</option>
+                    <option value="b">Opcija B</option>
+                    <option value="c">Opcija C</option>
+                    <option value="d">Opcija D</option>
+                </select>
+
+                <CheckboxGroup onChange={(x) => console.log(x)} options={
+                    ["op a", "op b", "op c", "op d"]
+                } />
             </div>
             <div className={"flex flex-col gap-2"}>
                 <CardSmall vessel={vessel}/>
