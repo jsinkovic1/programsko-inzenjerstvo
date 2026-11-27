@@ -164,8 +164,8 @@ function Map() {
                         min={MIN_CAPACITY}
                         max={limits.capacity}
                         step={1}
-                        valueLow={filter.CapacityLower ?? MIN_CAPACITY}
-                        valueHigh={filter.CapacityHigher ?? limits.capacity}
+                        valueLow={MIN_CAPACITY}
+                        valueHigh={limits.capacity}
                         onChange={rangeHandler("CapacityLower", "CapacityHigher", MIN_CAPACITY, limits.capacity)}
                     />
                     Kabina: {rangeLabel(filter.CabinNumberLower, filter.CabinNumberHigher, MIN_CABINS, limits.cabins)}
@@ -173,8 +173,8 @@ function Map() {
                         min={MIN_CABINS}
                         max={limits.cabins}
                         step={1}
-                        valueLow={filter.CabinNumberLower ?? MIN_CABINS}
-                        valueHigh={filter.CabinNumberHigher ?? limits.cabins}
+                        valueLow={MIN_CABINS}
+                        valueHigh={limits.cabins}
                         onChange={rangeHandler("CabinNumberLower", "CabinNumberHigher", MIN_CABINS, limits.cabins)}
                     />
                     Ležajeva: {rangeLabel(filter.BedNumberLower, filter.BedNumberHigher, MIN_BEDS, limits.beds)}
@@ -182,8 +182,8 @@ function Map() {
                         min={MIN_BEDS}
                         max={limits.beds}
                         step={1}
-                        valueLow={filter.BedNumberLower ?? MIN_BEDS}
-                        valueHigh={filter.BedNumberHigher ?? limits.beds}
+                        valueLow={MIN_BEDS}
+                        valueHigh={limits.beds}
                         onChange={rangeHandler("BedNumberLower", "BedNumberHigher", MIN_BEDS, limits.beds)}
                     />
 
@@ -193,8 +193,8 @@ function Map() {
                         min={0}
                         max={9999}
                         step={25}
-                        valueLow={filter.PriceLower ?? 0}
-                        valueHigh={filter.PriceHigher ?? 9999}
+                        valueLow={0}
+                        valueHigh={9999}
                         onChange={rangeHandler("PriceLower", "PriceHigher", 0, 9999)}
                     />
 

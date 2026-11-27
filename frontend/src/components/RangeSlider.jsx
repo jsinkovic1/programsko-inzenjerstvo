@@ -18,25 +18,29 @@ class RangeSlider extends Component {
     }
 
     getLow() {
-        return this.clamp(this.props.valueLow ?? this.state.valueLow);
+        return this.clamp(this.state.valueLow);
     }
 
     getHigh() {
-        return this.clamp(this.props.valueHigh ?? this.state.valueHigh);
+        return this.clamp(this.state.valueHigh);
     }
 
     handleChangeLow = (e) => {
         const value = Number(e.target.value);
         const high = this.getHigh();
-        this.setState({valueLow: value});
-        this.props.onChange?.(Math.min(value, high), Math.max(value, high));
+        this.setState({valueLow: value, valueHigh: Math.max(value, high)});
     }
 
     handleChangeHigh = (e) => {
         const value = Number(e.target.value);
         const low = this.getLow();
-        this.setState({valueHigh: value});
-        this.props.onChange?.(Math.min(low, value), Math.max(low, value));
+        this.setState({valueHigh: value, valueLow: Math.min(value, low)});
+    }
+    
+    handleDragEnd = () => {
+        const low = this.getLow();
+        const high = this.getHigh();
+        this.props.onChange?.(Math.min(low, high), Math.max(low, high));
     }
 
     render() {
@@ -54,8 +58,8 @@ class RangeSlider extends Component {
             <div className="range-slider-container">
                 <div className={"range-slider-track"} />
                 <div className={"range-slider-fill"} style={{"transform": "translate(" + translateX + "%, 0px) scale(" + percFilled + ", 1)" }} />
-                <input className={"range-slider -mb-4 " + (this.props.className ?? "")} type="range" min={min} max={max} value={low} onChange={this.handleChangeLow} step={this.props.step}/>
-                <input className={"range-slider -mb-4 " + (this.props.className ?? "")} type="range" min={min} max={max} value={high} onChange={this.handleChangeHigh} step={this.props.step}/>
+                <input className={"range-slider -mb-4 " + (this.props.className ?? "")} type="range" min={min} max={max} value={low} onChange={this.handleChangeLow} onMouseUp={this.handleDragEnd} step={this.props.step}/>
+                <input className={"range-slider -mb-4 " + (this.props.className ?? "")} type="range" min={min} max={max} value={high} onChange={this.handleChangeHigh} onMouseUp={this.handleDragEnd} step={this.props.step}/>
             </div>
         );
     }

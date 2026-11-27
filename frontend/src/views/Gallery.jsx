@@ -61,7 +61,7 @@ function Gallery() {
 
                 {/* Slideri */}
                 <Slider min={0} max={100} step={1}/>
-                <RangeSlider min={0} max={10} step={1}/>
+                <RangeSlider min={0} max={10} step={1} onChange={(low, high) => console.log(`${low} - ${high}`)}/>
 
                 {/* Gumbi s ikonom */}
                 <div className={"flex flex-row gap-2 h-10"}>
